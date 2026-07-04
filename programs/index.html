@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>教材一覧 | 支援プログラムLab</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body data-depth="one">
+  <header class="site-header">
+    <a class="brand" href="../"><span class="brand-mark">支</span><span>支援プログラムLab</span></a>
+    <nav class="site-nav" aria-label="主要ナビゲーション">
+      <a href="../">ホーム</a><a href="./">教材一覧</a><a href="../samples/">無料サンプル</a><a href="../pricing-preview/">料金案</a><a href="../about/">方針</a><a href="../contact/">相談する</a>
+    </nav>
+  </header>
+  <main>
+    <section class="hero">
+      <p class="eyebrow">Program library</p>
+      <h1>教材一覧</h1>
+      <p class="lead">無料で全て使える教材、構成を確認できるプレビュー、有料版で拡張予定の教材をまとめています。</p>
+    </section>
+    <section class="section">
+      <div class="library-tools" aria-label="教材検索">
+        <input type="search" data-program-search placeholder="キーワードで探す">
+        <select data-program-category aria-label="カテゴリ">
+          <option value="all">全カテゴリ</option>
+          <option value="business-manners">ビジネスマナー</option>
+          <option value="communication">コミュニケーション</option>
+          <option value="money-management">金銭管理</option>
+          <option value="life-management">生活管理</option>
+          <option value="employment-readiness">就労準備</option>
+        </select>
+        <select data-program-access aria-label="公開範囲">
+          <option value="all">公開範囲すべて</option>
+          <option value="free-full">フル無料</option>
+          <option value="free-preview">無料プレビュー</option>
+          <option value="planned-paid">有料予定</option>
+        </select>
+      </div>
+      <div class="grid" data-render-programs="all" data-program-list></div>
+    </section>
+  </main>
+  <footer class="footer"><p>個別ケースや利用者情報は入力しないサンプルサイトです。</p></footer>
+  <script src="../assets/data/programs.js"></script>
+  <script src="../assets/js/site.js"></script>
+</body>
+</html>
