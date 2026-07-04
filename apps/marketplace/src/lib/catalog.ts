@@ -1,4 +1,4 @@
-import type { LicenseInput } from "./marketplace";
+import type { LicenseInput, SellerSubmission } from "./marketplace";
 
 export type MarketplaceMaterial = {
   id: string;
@@ -118,5 +118,82 @@ export const demoEntitlements = [
     buyerId: "demo-buyer",
     materialId: "report-contact-consult",
     sourcePurchaseId: "free_access",
+  },
+];
+
+export type Phase2Submission = SellerSubmission & {
+  category: string;
+  priceYen: number;
+  licenseLabel: string;
+  riskFlags: string[];
+  includedFiles: string[];
+  reviewNote: string;
+};
+
+export const demoSellerSubmissions: Phase2Submission[] = [
+  {
+    id: "draft_sleep_rhythm",
+    title: "睡眠リズムを整える",
+    sellerName: "アソシア教材チーム",
+    status: "draft",
+    updatedAt: "2026-07-01",
+    category: "生活管理",
+    priceYen: 0,
+    licenseLabel: "現場で編集OK",
+    riskFlags: [],
+    includedFiles: ["生活リズム表", "講師メモ", "振り返りシート"],
+    reviewNote: "画像なし。無料公開のサンプル教材として準備中。",
+  },
+  {
+    id: "submitted_question",
+    title: "質問の仕方",
+    sellerName: "就労支援サンプル事業所",
+    status: "submitted",
+    updatedAt: "2026-07-03",
+    category: "コミュニケーション",
+    priceYen: 1800,
+    licenseLabel: "現場で編集OK",
+    riskFlags: ["価格あり", "外部出品者"],
+    includedFiles: ["場面カード", "利用者ワーク", "講師用進行表"],
+    reviewNote: "文例の出典確認と、利用者事例が架空であることの確認が必要。",
+  },
+  {
+    id: "submitted_time",
+    title: "時間を守る工夫",
+    sellerName: "アソシア教材チーム",
+    status: "submitted",
+    updatedAt: "2026-07-04",
+    category: "ビジネスマナー",
+    priceYen: 2200,
+    licenseLabel: "現場で編集OK",
+    riskFlags: ["価格あり"],
+    includedFiles: ["朝の手順ワーク", "連絡文テンプレート", "実施記録文例"],
+    reviewNote: "遅刻を責める表現になっていないか重点確認。",
+  },
+  {
+    id: "approved_greeting",
+    title: "挨拶と第一印象",
+    sellerName: "アソシア教材チーム",
+    status: "approved",
+    updatedAt: "2026-07-02",
+    category: "ビジネスマナー",
+    priceYen: 0,
+    licenseLabel: "現場で編集OK",
+    riskFlags: [],
+    includedFiles: ["講師用台本", "利用者ワーク", "振り返りシート"],
+    reviewNote: "公開済み。Phase 1無料教材として利用中。",
+  },
+  {
+    id: "rejected_interview",
+    title: "面接準備の入口",
+    sellerName: "就労支援サンプル事業所",
+    status: "rejected",
+    updatedAt: "2026-07-04",
+    category: "就労準備",
+    priceYen: 2400,
+    licenseLabel: "そのまま利用",
+    riskFlags: ["効果表現の確認", "差し戻し"],
+    includedFiles: ["面接質問例", "回答メモ"],
+    reviewNote: "採用可能性を高める表現が強いため、保証に見えない表現へ修正依頼。",
   },
 ];

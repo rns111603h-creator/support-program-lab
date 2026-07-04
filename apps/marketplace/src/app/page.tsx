@@ -22,6 +22,8 @@ export default function Home() {
           <nav className="flex items-center gap-5 text-sm font-semibold text-[var(--ink-soft)]">
             <Link href="#materials">教材</Link>
             <Link href="#bundles">セット</Link>
+            <Link href="/seller">出品者</Link>
+            <Link href="/admin/review">審査</Link>
             <Link href="/library">マイライブラリ</Link>
           </nav>
         </div>
@@ -53,6 +55,12 @@ export default function Home() {
               href="/library"
             >
               マイライブラリ
+            </Link>
+            <Link
+              className="inline-flex min-h-12 items-center border border-[var(--line)] bg-[var(--paper)] px-6 text-sm font-bold text-[var(--foreground)]"
+              href="/seller"
+            >
+              出品者モック
             </Link>
           </div>
         </div>

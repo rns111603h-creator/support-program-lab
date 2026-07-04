@@ -22,6 +22,16 @@ export type Entitlement = {
   sourcePurchaseId: string;
 };
 
+export type SubmissionStatus = "draft" | "submitted" | "approved" | "rejected";
+
+export type SellerSubmission = {
+  id: string;
+  title: string;
+  sellerName: string;
+  status: SubmissionStatus;
+  updatedAt: string;
+};
+
 export type PurchaseInput =
   | {
       type: "material";
@@ -92,4 +102,27 @@ export function getLibraryMaterials<TMaterial extends MaterialSummary>(input: {
   );
 
   return input.materials.filter((material) => allowedMaterialIds.has(material.id));
+}
+
+export function getReviewQueue<TSubmission extends SellerSubmission>(
+  submissions: TSubmission[],
+): TSubmission[] {
+  return submissions
+    .filter((submission) => submission.status === "submitted")
+    .toSorted((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+}
+
+export function summarizeSellerSubmissions(submissions: SellerSubmission[]) {
+  return submissions.reduce(
+    (summary, submission) => {
+      summary[submission.status] += 1;
+      return summary;
+    },
+    {
+      draft: 0,
+      submitted: 0,
+      approved: 0,
+      rejected: 0,
+    } satisfies Record<SubmissionStatus, number>,
+  );
 }

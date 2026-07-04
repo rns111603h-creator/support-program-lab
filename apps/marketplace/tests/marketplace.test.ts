@@ -4,6 +4,8 @@ import {
   calculateBundleDisplay,
   createEntitlementsForPurchase,
   getLibraryMaterials,
+  getReviewQueue,
+  summarizeSellerSubmissions,
 } from "../src/lib/marketplace";
 
 describe("buildLicenseBadges", () => {
@@ -122,5 +124,77 @@ describe("getLibraryMaterials", () => {
         priceYen: 0,
       },
     ]);
+  });
+});
+
+describe("getReviewQueue", () => {
+  it("returns submitted materials sorted by most recent update first", () => {
+    const queue = getReviewQueue([
+      {
+        id: "draft_1",
+        title: "睡眠リズムを整える",
+        sellerName: "アソシア教材チーム",
+        status: "draft",
+        updatedAt: "2026-07-01",
+      },
+      {
+        id: "submitted_1",
+        title: "質問の仕方",
+        sellerName: "就労支援サンプル事業所",
+        status: "submitted",
+        updatedAt: "2026-07-03",
+      },
+      {
+        id: "submitted_2",
+        title: "時間を守る工夫",
+        sellerName: "アソシア教材チーム",
+        status: "submitted",
+        updatedAt: "2026-07-04",
+      },
+    ]);
+
+    expect(queue.map((item) => item.id)).toEqual(["submitted_2", "submitted_1"]);
+  });
+});
+
+describe("summarizeSellerSubmissions", () => {
+  it("counts draft, submitted, approved, and rejected materials", () => {
+    const summary = summarizeSellerSubmissions([
+      {
+        id: "draft_1",
+        title: "睡眠リズムを整える",
+        sellerName: "アソシア教材チーム",
+        status: "draft",
+        updatedAt: "2026-07-01",
+      },
+      {
+        id: "submitted_1",
+        title: "質問の仕方",
+        sellerName: "アソシア教材チーム",
+        status: "submitted",
+        updatedAt: "2026-07-03",
+      },
+      {
+        id: "approved_1",
+        title: "挨拶と第一印象",
+        sellerName: "アソシア教材チーム",
+        status: "approved",
+        updatedAt: "2026-07-02",
+      },
+      {
+        id: "rejected_1",
+        title: "面接準備の入口",
+        sellerName: "アソシア教材チーム",
+        status: "rejected",
+        updatedAt: "2026-07-04",
+      },
+    ]);
+
+    expect(summary).toEqual({
+      draft: 1,
+      submitted: 1,
+      approved: 1,
+      rejected: 1,
+    });
   });
 });
