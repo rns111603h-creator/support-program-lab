@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { LicenseBadges } from "@/components/license-badges";
+import { SiteHeader } from "@/components/site-header";
+import { SheetStackIcon } from "@/components/ui-icons";
 import { bundles, materials } from "@/lib/catalog";
 import { calculateBundleDisplay } from "@/lib/marketplace";
 
@@ -13,51 +15,38 @@ export default function Home() {
   });
 
   return (
-    <main className="min-h-screen">
-      <header className="border-b border-[var(--line)] bg-[var(--paper)]/88">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-          <Link className="text-lg font-black tracking-[0.08em]" href="/">
-            支援プログラムLab
-          </Link>
-          <nav className="flex items-center gap-5 text-sm font-semibold text-[var(--ink-soft)]">
-            <Link href="/materials">教材</Link>
-            <Link href="#bundles">セット</Link>
-            <Link href="/seller">出品者</Link>
-            <Link href="/admin/review">審査</Link>
-            <Link href="/library">マイライブラリ</Link>
-          </nav>
-        </div>
-      </header>
+    <main className="min-h-screen bg-[var(--background)]">
+      <SiteHeader active="top" />
 
-      <section className="mx-auto grid max-w-7xl gap-10 px-6 py-16 lg:grid-cols-[1fr_420px] lg:items-end">
+      <section className="mx-auto grid max-w-7xl gap-12 px-5 py-18 md:px-8 lg:grid-cols-[1fr_460px] lg:items-center">
         <div>
-          <p className="mb-5 text-xs font-black tracking-[0.24em] text-[var(--gold)]">
-            CLOSED FREE MVP
+          <p className="font-en mb-7 text-xs font-medium tracking-[0.42em] text-[var(--muted)]">
+            PROGRAM LIBRARY FOR WELFARE
           </p>
-          <h1 className="max-w-4xl text-4xl font-black leading-tight tracking-normal md:text-6xl">
+          <h1 className="max-w-4xl text-4xl font-normal leading-[1.65] tracking-normal md:text-6xl">
             福祉現場の教材を、
             <br />
-            安全に共有する土台。
+            安全に共有する場所。
           </h1>
-          <p className="mt-7 max-w-2xl text-base leading-8 text-[var(--ink-soft)]">
+          <p className="mt-8 max-w-2xl text-sm leading-9 text-[var(--ink-soft)] md:text-base">
             まずはすべての教材を無料で共有できる場所として育てます。
             有料販売と決済の土台は残しながら、投稿・コメント・いいねで教材が見つかる体験を先に作ります。
           </p>
           <div className="mt-9 flex flex-wrap gap-3">
             <Link
-              className="inline-flex min-h-12 items-center bg-[#31302c] px-6 text-sm font-bold text-white"
+              className="inline-flex min-h-14 items-center bg-[var(--foreground)] px-8 text-sm font-bold tracking-[0.14em] text-white"
               href="/materials"
             >
               教材を見る
             </Link>
             <Link
-              className="inline-flex min-h-12 items-center border border-[var(--line)] bg-[var(--paper)] px-6 text-sm font-bold text-[var(--foreground)]"
+              className="inline-flex min-h-14 items-center border border-[var(--line-strong)] bg-[var(--paper)] px-8 text-sm font-bold tracking-[0.14em] text-[var(--foreground)]"
               href="/library"
             >
               マイライブラリ
             </Link>
             <Link
-              className="inline-flex min-h-12 items-center border border-[var(--line)] bg-[var(--paper)] px-6 text-sm font-bold text-[var(--foreground)]"
+              className="inline-flex min-h-14 items-center border border-[var(--line-strong)] bg-[var(--paper)] px-8 text-sm font-bold tracking-[0.14em] text-[var(--foreground)]"
               href="/seller"
             >
               出品者モック
@@ -65,8 +54,9 @@ export default function Home() {
           </div>
         </div>
 
-        <aside className="border border-[var(--line)] bg-[var(--paper)] p-6 shadow-[0_24px_80px_rgba(49,48,44,0.08)]">
-          <p className="text-xs font-black tracking-[0.18em] text-[var(--indigo)]">
+        <aside className="relative border border-[var(--line-strong)] bg-[var(--paper)] p-7 shadow-[0_30px_90px_rgba(60,60,60,0.06)]">
+          <SheetStackIcon className="mx-auto mb-6 h-36 w-56 text-[var(--indigo)]" />
+          <p className="font-en text-xs font-medium tracking-[0.28em] text-[var(--indigo)]">
             FUTURE: BUNDLE PURCHASE
           </p>
           <h2 className="mt-4 text-2xl font-black">{featuredBundle.title}</h2>
@@ -74,15 +64,15 @@ export default function Home() {
             {featuredBundle.description}
           </p>
           <dl className="mt-5 grid grid-cols-3 gap-2 text-sm">
-            <div className="bg-[#f3efe5] p-3">
+            <div className="border border-[var(--line)] bg-[#FCFCFA] p-3">
               <dt className="text-xs text-[var(--ink-soft)]">単品合計</dt>
               <dd className="mt-1 font-black">¥{bundlePricing.singleTotalYen.toLocaleString()}</dd>
             </div>
-            <div className="bg-[#f3efe5] p-3">
+            <div className="border border-[var(--line)] bg-[#FCFCFA] p-3">
               <dt className="text-xs text-[var(--ink-soft)]">将来セット</dt>
               <dd className="mt-1 font-black">¥{bundlePricing.bundlePriceYen.toLocaleString()}</dd>
             </div>
-            <div className="bg-[#f3efe5] p-3">
+            <div className="border border-[var(--line)] bg-[#FCFCFA] p-3">
               <dt className="text-xs text-[var(--ink-soft)]">割引</dt>
               <dd className="mt-1 font-black">{bundlePricing.discountRate}%</dd>
             </div>
@@ -90,10 +80,10 @@ export default function Home() {
         </aside>
       </section>
 
-      <section id="materials" className="mx-auto max-w-7xl px-6 py-12">
-        <div className="mb-7 flex items-end justify-between gap-6">
+      <section id="materials" className="mx-auto max-w-7xl border-t border-[var(--line)] px-5 py-14 md:px-8">
+        <div className="mb-8 flex items-end justify-between gap-6">
           <div>
-            <p className="text-xs font-black tracking-[0.18em] text-[var(--gold)]">
+            <p className="font-en text-xs font-medium tracking-[0.34em] text-[var(--gold)]">
               MATERIALS
             </p>
             <h2 className="mt-2 text-3xl font-black">無料MVP教材</h2>
@@ -106,10 +96,10 @@ export default function Home() {
         <div className="grid gap-5 md:grid-cols-3">
           {materials.map((material) => (
             <article
-              className="border border-[var(--line)] bg-[var(--paper)] p-5"
+              className="border border-[var(--line)] bg-[var(--paper)] p-5 transition-colors hover:border-[var(--line-strong)]"
               key={material.id}
             >
-              <p className="text-xs font-bold text-[var(--gold)]">{material.category}</p>
+              <p className="font-en text-xs font-medium tracking-[0.22em] text-[var(--gold)]">{material.category}</p>
               <h3 className="mt-3 text-xl font-black">{material.title}</h3>
               <p className="mt-3 min-h-20 text-sm leading-7 text-[var(--ink-soft)]">
                 {material.summary}
@@ -118,7 +108,7 @@ export default function Home() {
                 <LicenseBadges {...material.license} />
               </div>
               <Link
-                className="mt-5 inline-flex min-h-11 w-full items-center justify-center bg-[#31302c] text-sm font-bold text-white"
+                className="mt-5 inline-flex min-h-11 w-full items-center justify-center border border-[var(--foreground)] bg-[var(--foreground)] text-sm font-bold tracking-[0.12em] text-white"
                 href={`/materials/${material.slug}`}
               >
                 詳細を見る
@@ -129,8 +119,8 @@ export default function Home() {
       </section>
 
       <section id="bundles" className="mx-auto max-w-7xl px-6 py-12 pb-20">
-        <div className="border border-[var(--line)] bg-[#31302c] p-8 text-white">
-          <p className="text-xs font-black tracking-[0.18em] text-[#d8bf80]">BUNDLE MODEL</p>
+        <div className="border border-[var(--foreground)] bg-[var(--foreground)] p-8 text-white">
+          <p className="font-en text-xs font-medium tracking-[0.28em] text-[#D5C18C]">BUNDLE MODEL</p>
           <h2 className="mt-3 text-3xl font-black">セット販売は後で実装。いまは教材を無料で広げる</h2>
           <p className="mt-4 max-w-3xl text-sm leading-8 text-[#e9e3d7]">
             価格計算や購入権限のロジックは残したまま、表示上は無料共有を優先します。

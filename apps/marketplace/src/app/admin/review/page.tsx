@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { SiteHeader } from "@/components/site-header";
 import { demoSellerSubmissions } from "@/lib/catalog";
 import { getReviewQueue } from "@/lib/marketplace";
 
@@ -6,24 +6,22 @@ export default function AdminReviewMockPage() {
   const reviewQueue = getReviewQueue(demoSellerSubmissions);
 
   return (
-    <main className="min-h-screen px-6 py-10">
-      <div className="mx-auto max-w-7xl">
-        <Link className="text-sm font-bold text-[var(--indigo)]" href="/">
-          ← トップへ戻る
-        </Link>
+    <main className="min-h-screen bg-[var(--background)]">
+      <SiteHeader active="review" />
+      <div className="mx-auto max-w-7xl px-5 py-10">
 
         <header className="mt-8 grid gap-6 border border-[var(--line)] bg-[var(--paper)] p-8 lg:grid-cols-[1fr_360px]">
           <div>
-            <p className="text-xs font-black tracking-[0.18em] text-[var(--gold)]">
+            <p className="font-en text-xs font-medium tracking-[0.34em] text-[var(--gold)]">
               ADMIN REVIEW MOCK
             </p>
-            <h1 className="mt-3 text-4xl font-black">運営審査キュー</h1>
+            <h1 className="mt-3 text-4xl font-normal">運営審査キュー</h1>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--ink-soft)]">
               Phase 2では、投稿された教材をすぐ公開せず、著作権・個人情報・表現・ライセンスを確認する運営画面を見せます。
               実際の承認処理はまだ行わないプロトタイプです。
             </p>
           </div>
-          <div className="bg-[#f3efe5] p-5">
+          <div className="border border-[var(--line)] bg-[#FCFCFA] p-5">
             <p className="text-sm font-black">審査待ち</p>
             <p className="mt-2 text-5xl font-black">{reviewQueue.length}</p>
             <p className="mt-3 text-xs leading-6 text-[var(--ink-soft)]">
@@ -82,7 +80,7 @@ export default function AdminReviewMockPage() {
                 </div>
               </div>
 
-              <aside className="border border-[var(--line)] bg-[#f8f4ea] p-5">
+              <aside className="border border-[var(--line)] bg-[#FCFCFA] p-5">
                 <p className="text-sm font-black">レビューコメント</p>
                 <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
                   {submission.reviewNote}
@@ -109,11 +107,14 @@ export default function AdminReviewMockPage() {
 
 function ReviewBlock({ title, items }: { title: string; items: string[] }) {
   return (
-    <div className="bg-[#f3efe5] p-4">
+    <div className="border border-[var(--line)] bg-[#FCFCFA] p-4">
       <p className="text-sm font-black">{title}</p>
       <ul className="mt-3 space-y-2 text-sm text-[var(--ink-soft)]">
         {items.map((item) => (
-          <li key={item}>・{item}</li>
+          <li className="flex items-center gap-2" key={item}>
+            <span className="size-1.5 rounded-full bg-[var(--gold)]" />
+            {item}
+          </li>
         ))}
       </ul>
     </div>

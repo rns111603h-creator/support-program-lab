@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { SiteHeader } from "@/components/site-header";
+import { UploadIcon } from "@/components/ui-icons";
 import { demoSellerSubmissions } from "@/lib/catalog";
 import { summarizeSellerSubmissions } from "@/lib/marketplace";
 
@@ -24,18 +26,16 @@ export default function SellerDashboardPage() {
   const summary = summarizeSellerSubmissions(sellerSubmissions);
 
   return (
-    <main className="min-h-screen px-6 py-10">
-      <div className="mx-auto max-w-7xl">
-        <Link className="text-sm font-bold text-[var(--indigo)]" href="/">
-          ← トップへ戻る
-        </Link>
+    <main className="min-h-screen bg-[var(--background)]">
+      <SiteHeader active="seller" />
+      <div className="mx-auto max-w-7xl px-5 py-10">
 
         <header className="mt-8 grid gap-6 border border-[var(--line)] bg-[var(--paper)] p-8 lg:grid-cols-[1fr_360px]">
           <div>
-            <p className="text-xs font-black tracking-[0.18em] text-[var(--gold)]">
+            <p className="font-en text-xs font-medium tracking-[0.34em] text-[var(--gold)]">
               SELLER BETA MOCK
             </p>
-            <h1 className="mt-3 text-4xl font-black">出品者ダッシュボード</h1>
+            <h1 className="mt-3 text-4xl font-normal">出品者ダッシュボード</h1>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--ink-soft)]">
               教材を下書きし、ファイル構成とライセンスを確認して、運営審査へ提出する流れのプロトタイプです。
               実際の保存・アップロード・本人確認は次の本格実装で接続します。
@@ -54,13 +54,14 @@ export default function SellerDashboardPage() {
             <h2 className="text-lg font-black">次の操作</h2>
             <div className="mt-5 grid gap-3">
               <Link
-                className="inline-flex min-h-12 items-center justify-center bg-[#31302c] text-sm font-bold text-white"
+                className="inline-flex min-h-12 items-center justify-center gap-2 bg-[var(--foreground)] text-sm font-bold tracking-[0.12em] text-white"
                 href="/seller/materials/new"
               >
+                <UploadIcon />
                 教材を作成する
               </Link>
               <Link
-                className="inline-flex min-h-12 items-center justify-center border border-[var(--line)] bg-[#f3efe5] text-sm font-bold"
+                className="inline-flex min-h-12 items-center justify-center border border-[var(--line-strong)] bg-[#FCFCFA] text-sm font-bold"
                 href="/admin/review"
               >
                 審査画面を見る
@@ -99,7 +100,7 @@ export default function SellerDashboardPage() {
                     {submission.reviewNote}
                   </p>
                 </div>
-                <button className="min-h-11 self-center border border-[var(--line)] bg-[#f3efe5] text-sm font-bold">
+                <button className="min-h-11 self-center border border-[var(--line-strong)] bg-[#FCFCFA] text-sm font-bold">
                   編集モック
                 </button>
               </article>
@@ -113,7 +114,7 @@ export default function SellerDashboardPage() {
 
 function Metric({ label, value }: { label: string; value: number }) {
   return (
-    <div className="bg-[#f3efe5] p-4">
+    <div className="border border-[var(--line)] bg-[#FCFCFA] p-4">
       <p className="text-xs font-bold text-[var(--ink-soft)]">{label}</p>
       <p className="mt-1 text-3xl font-black">{value}</p>
     </div>

@@ -1,12 +1,12 @@
 import { buildLicenseBadges, type LicenseInput } from "@/lib/marketplace";
 
 const toneClass = {
-  green: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  slate: "border-slate-200 bg-slate-50 text-slate-600",
-  amber: "border-amber-200 bg-amber-50 text-amber-700",
-  blue: "border-blue-200 bg-blue-50 text-blue-700",
-  indigo: "border-indigo-200 bg-indigo-50 text-indigo-700",
-  rose: "border-rose-200 bg-rose-50 text-rose-700",
+  green: "border-[#D5D5CC] bg-[#FCFCFA] text-[#5A5A52]",
+  slate: "border-[#E5E5DF] bg-[#FCFCFA] text-[#77776F]",
+  amber: "border-[#E8DEC5] bg-[#FCFCFA] text-[#8C6F2F]",
+  blue: "border-[#D7DEE3] bg-[#FCFCFA] text-[#5F6B76]",
+  indigo: "border-[#D7DEE3] bg-[#FCFCFA] text-[#6E7F8D]",
+  rose: "border-[#E5D8D8] bg-[#FCFCFA] text-[#8C5D5D]",
 };
 
 export function LicenseBadges(input: LicenseInput) {
@@ -14,9 +14,10 @@ export function LicenseBadges(input: LicenseInput) {
     <div className="flex flex-wrap gap-2">
       {buildLicenseBadges(input).map((badge) => (
         <span
-          className={`inline-flex min-h-8 items-center border px-3 text-xs font-bold ${toneClass[badge.tone]}`}
+          className={`inline-flex min-h-8 items-center gap-2 border px-3 text-xs font-bold ${toneClass[badge.tone]}`}
           key={badge.label}
         >
+          <span className="size-1.5 rounded-full bg-current opacity-55" />
           {badge.label}
         </span>
       ))}

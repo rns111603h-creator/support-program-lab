@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LicenseBadges } from "@/components/license-badges";
+import { SiteHeader } from "@/components/site-header";
+import { CommentIcon, DownloadIcon, HeartIcon } from "@/components/ui-icons";
 import { communityMaterials } from "@/lib/catalog";
 
 export function generateStaticParams() {
@@ -20,21 +22,19 @@ export default async function MaterialPage({
   }
 
   return (
-    <main className="min-h-screen px-6 py-10">
-      <div className="mx-auto max-w-5xl">
-        <Link className="text-sm font-bold text-[var(--indigo)]" href="/">
-          ← トップへ戻る
-        </Link>
-        <Link className="ml-5 text-sm font-bold text-[var(--indigo)]" href="/materials">
-          教材フィードへ
+    <main className="min-h-screen bg-[var(--background)]">
+      <SiteHeader active="materials" />
+      <div className="mx-auto max-w-5xl px-5 py-10">
+        <Link className="text-sm font-bold text-[var(--indigo)]" href="/materials">
+          ← 教材フィードへ戻る
         </Link>
 
         <section className="mt-8 grid gap-8 lg:grid-cols-[1fr_320px]">
           <article className="border border-[var(--line)] bg-[var(--paper)] p-8">
-            <p className="text-xs font-black tracking-[0.18em] text-[var(--gold)]">
+            <p className="font-en text-xs font-medium tracking-[0.34em] text-[var(--gold)]">
               {material.category}
             </p>
-            <h1 className="mt-4 text-4xl font-black leading-tight">{material.title}</h1>
+            <h1 className="mt-4 text-4xl font-normal leading-[1.45]">{material.title}</h1>
             <p className="mt-5 text-sm font-bold text-[var(--ink-soft)]">
               出品者: {material.sellerName}
             </p>
@@ -47,39 +47,54 @@ export default async function MaterialPage({
             </div>
 
             <div className="mt-6 flex flex-wrap items-center gap-4 text-sm font-bold text-[var(--ink-soft)]">
-              <span>♡ {material.likes}</span>
-              <span>💬 {material.comments.length}</span>
-              <span className="text-emerald-700">無料公開中</span>
+              <span className="inline-flex items-center gap-1.5">
+                <HeartIcon />
+                {material.likes}
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <CommentIcon />
+                {material.comments.length}
+              </span>
+              <span className="text-[#5F6B76]">無料公開中</span>
             </div>
 
             <div className="mt-8 grid gap-4 md:grid-cols-2">
-              <div className="bg-[#f3efe5] p-5">
+              <div className="border border-[var(--line)] bg-[#FCFCFA] p-5">
                 <h2 className="text-sm font-black">対象サービス</h2>
                 <ul className="mt-3 space-y-2 text-sm text-[var(--ink-soft)]">
                   {material.targetServices.map((service) => (
-                    <li key={service}>・{service}</li>
+                    <li className="flex items-center gap-2" key={service}>
+                      <span className="size-1.5 rounded-full bg-[var(--gold)]" />
+                      {service}
+                    </li>
                   ))}
                 </ul>
               </div>
-              <div className="bg-[#f3efe5] p-5">
+              <div className="border border-[var(--line)] bg-[#FCFCFA] p-5">
                 <h2 className="text-sm font-black">含まれるファイル</h2>
                 <ul className="mt-3 space-y-2 text-sm text-[var(--ink-soft)]">
                   {material.includedFiles.map((file) => (
-                    <li key={file}>・{file}</li>
+                    <li className="flex items-center gap-2" key={file}>
+                      <span className="size-1.5 rounded-full bg-[var(--blue-soft)]" />
+                      {file}
+                    </li>
                   ))}
                 </ul>
               </div>
             </div>
 
             {material.supportItems && material.supportItems.length > 0 ? (
-              <div className="mt-4 border border-[var(--line)] bg-[#fbf8f0] p-4">
+              <div className="mt-4 border border-[var(--line)] bg-[#FCFCFA] p-4">
                 <h2 className="text-sm font-black">補助資料</h2>
                 <p className="mt-2 text-xs leading-6 text-[var(--ink-soft)]">
                   教材実施後に必要な場合だけ参照する付属資料です。教材そのものの主役にはしていません。
                 </p>
                 <ul className="mt-3 space-y-2 text-sm text-[var(--ink-soft)]">
                   {material.supportItems.map((item) => (
-                    <li key={item}>・{item}</li>
+                    <li className="flex items-center gap-2" key={item}>
+                      <span className="size-1.5 rounded-full bg-[var(--line-strong)]" />
+                      {item}
+                    </li>
                   ))}
                 </ul>
               </div>
@@ -91,7 +106,7 @@ export default async function MaterialPage({
                 <div className="mt-4 grid gap-3">
                   {material.comments.map((comment) => (
                     <article
-                      className="bg-[#f3efe5] p-4"
+                      className="border border-[var(--line)] bg-[#FCFCFA] p-4"
                       key={`${comment.authorName}:${comment.body}`}
                     >
                       <p className="text-sm font-black">{comment.authorName}</p>
@@ -106,23 +121,25 @@ export default async function MaterialPage({
           </article>
 
           <aside className="h-fit border border-[var(--line)] bg-[var(--paper)] p-6">
-            <p className="text-xs font-black tracking-[0.18em] text-[var(--indigo)]">
+            <p className="font-en text-xs font-medium tracking-[0.28em] text-[var(--indigo)]">
               DOWNLOAD
             </p>
-            <p className="mt-4 text-3xl font-black">
+            <p className="mt-4 text-3xl font-normal">
               無料
             </p>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               現在はすべての教材を無料で入手できます。将来の有料化に備えた価格・決済設計は保持しています。
             </p>
             <Link
-              className="mt-6 inline-flex min-h-12 w-full items-center justify-center bg-[#31302c] text-sm font-bold text-white"
+              className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 bg-[var(--foreground)] text-sm font-bold tracking-[0.12em] text-white"
               href="/library"
             >
+              <DownloadIcon />
               無料でライブラリに追加
             </Link>
-            <button className="mt-3 min-h-12 w-full border border-[var(--line)] bg-[#f3efe5] text-sm font-bold">
-              ♡ いいね
+            <button className="mt-3 inline-flex min-h-12 w-full items-center justify-center gap-2 border border-[var(--line-strong)] bg-[#FCFCFA] text-sm font-bold">
+              <HeartIcon />
+              いいね
             </button>
           </aside>
         </section>
