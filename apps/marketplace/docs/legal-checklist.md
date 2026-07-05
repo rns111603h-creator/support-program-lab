@@ -1,10 +1,10 @@
 # Legal Checklist
 
-This document must be reviewed before paid marketplace launch.
+This document must be reviewed before paid marketplace launch. The current prototype keeps all public materials free, but the paid rules are retained for the future version.
 
 ## Copyright
 
-- Sellers may upload only materials they created themselves or have written permission to license and sell.
+- Creators may upload only materials they created themselves or have written permission to share. Paid launch will also require permission to license and sell.
 - Seller grants the platform permission to host, preview, reproduce for delivery, watermark, promote, and archive materials for order history.
 - Buyer license must distinguish modification, commercial use, credit, redistribution, and resale rules.
 - Platform must provide a copyright infringement report flow.

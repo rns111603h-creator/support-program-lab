@@ -36,7 +36,7 @@ export default async function MaterialPage({
             </p>
             <h1 className="mt-4 text-4xl font-normal leading-[1.45]">{material.title}</h1>
             <p className="mt-5 text-sm font-bold text-[var(--ink-soft)]">
-              出品者: {material.sellerName}
+              投稿者: {material.sellerName}
             </p>
             <p className="mt-7 text-base leading-8 text-[var(--ink-soft)]">
               {material.description}
@@ -54,6 +54,10 @@ export default async function MaterialPage({
               <span className="inline-flex items-center gap-1.5">
                 <CommentIcon />
                 {material.comments.length}
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <DownloadIcon />
+                {material.downloads}
               </span>
               <span className="text-[#5F6B76]">無料公開中</span>
             </div>
@@ -102,7 +106,18 @@ export default async function MaterialPage({
 
             {material.comments.length > 0 ? (
               <section className="mt-8 border-t border-[var(--line)] pt-6">
-                <h2 className="text-lg font-black">コメント</h2>
+                <div className="flex flex-wrap items-end justify-between gap-3">
+                  <div>
+                    <h2 className="text-lg font-black">コメント</h2>
+                    <p className="mt-1 text-xs leading-6 text-[var(--ink-soft)]">
+                      実際の実装ではログイン利用者が感想や活用メモを投稿できます。
+                    </p>
+                  </div>
+                  <button className="inline-flex min-h-10 items-center gap-2 border border-[var(--line-strong)] bg-[#FCFCFA] px-4 text-xs font-bold">
+                    <CommentIcon />
+                    コメントする
+                  </button>
+                </div>
                 <div className="mt-4 grid gap-3">
                   {material.comments.map((comment) => (
                     <article
@@ -130,6 +145,17 @@ export default async function MaterialPage({
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
               現在はすべての教材を無料で入手できます。将来の有料化に備えた価格・決済設計は保持しています。
             </p>
+            {material.futurePriceYen ? (
+              <div className="mt-4 border border-[var(--line)] bg-[#FCFCFA] p-4">
+                <p className="text-xs font-black text-[var(--ink-soft)]">将来の有料版メモ</p>
+                <p className="mt-1 text-sm font-black">
+                  単品価格案 ¥{material.futurePriceYen.toLocaleString()}
+                </p>
+                <p className="mt-2 text-xs leading-6 text-[var(--ink-soft)]">
+                  MVPでは課金せず、無料利用と反応データを優先します。
+                </p>
+              </div>
+            ) : null}
             <Link
               className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 bg-[var(--foreground)] text-sm font-bold tracking-[0.12em] text-white"
               href="/library"
@@ -141,6 +167,14 @@ export default async function MaterialPage({
               <HeartIcon />
               いいね
             </button>
+            <div className="mt-5 border-t border-[var(--line)] pt-5">
+              <p className="text-sm font-black">共有前の確認</p>
+              <ul className="mt-3 space-y-2 text-xs leading-6 text-[var(--ink-soft)]">
+                <li>個人情報や実際の支援記録は含まない</li>
+                <li>事業所内での編集可否を確認する</li>
+                <li>他法人への再配布・転売はしない</li>
+              </ul>
+            </div>
           </aside>
         </section>
       </div>

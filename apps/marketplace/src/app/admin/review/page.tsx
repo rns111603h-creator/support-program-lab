@@ -18,7 +18,7 @@ export default function AdminReviewMockPage() {
             <h1 className="mt-3 text-4xl font-normal">運営審査キュー</h1>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--ink-soft)]">
               Phase 2では、投稿された教材をすぐ公開せず、著作権・個人情報・表現・ライセンスを確認する運営画面を見せます。
-              実際の承認処理はまだ行わないプロトタイプです。
+              実際の承認処理はまだ行わないプロトタイプで、公開は無料教材のみを対象にします。
             </p>
           </div>
           <div className="border border-[var(--line)] bg-[#FCFCFA] p-5">
@@ -48,15 +48,20 @@ export default function AdminReviewMockPage() {
                 <h2 className="mt-3 text-2xl font-black">{submission.title}</h2>
                 <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
                   {submission.category} / {submission.licenseLabel} /{" "}
-                  {submission.priceYen === 0
-                    ? "無料"
-                    : `¥${submission.priceYen.toLocaleString()}`}
+                  無料公開
+                  {submission.futurePriceYen
+                    ? ` / 将来価格案 ¥${submission.futurePriceYen.toLocaleString()}`
+                    : ""}
                 </p>
 
                 <div className="mt-4 flex flex-wrap gap-2">
-                  {submission.riskFlags.map((flag) => (
+                  {(submission.riskFlags.length > 0 ? submission.riskFlags : ["通常審査"]).map((flag) => (
                     <span
-                      className="inline-flex min-h-8 items-center border border-rose-200 bg-rose-50 px-3 text-xs font-bold text-rose-700"
+                      className={`inline-flex min-h-8 items-center border px-3 text-xs font-bold ${
+                        flag === "通常審査"
+                          ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                          : "border-rose-200 bg-rose-50 text-rose-700"
+                      }`}
                       key={flag}
                     >
                       {flag}

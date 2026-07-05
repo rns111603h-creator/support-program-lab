@@ -33,12 +33,12 @@ export default function SellerDashboardPage() {
         <header className="mt-8 grid gap-6 border border-[var(--line)] bg-[var(--paper)] p-8 lg:grid-cols-[1fr_360px]">
           <div>
             <p className="font-en text-xs font-medium tracking-[0.34em] text-[var(--gold)]">
-              SELLER BETA MOCK
+              CREATOR BETA MOCK
             </p>
-            <h1 className="mt-3 text-4xl font-normal">出品者ダッシュボード</h1>
+            <h1 className="mt-3 text-4xl font-normal">投稿者ダッシュボード</h1>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--ink-soft)]">
-              教材を下書きし、ファイル構成とライセンスを確認して、運営審査へ提出する流れのプロトタイプです。
-              実際の保存・アップロード・本人確認は次の本格実装で接続します。
+              教材を下書きし、無料公開の設定、ファイル構成、ライセンスを確認して、運営審査へ提出する流れのプロトタイプです。
+              有料販売は後の実装として残し、いまは投稿者と利用者を増やす設計にしています。
             </p>
           </div>
           <div className="grid grid-cols-2 gap-2 text-sm">
@@ -58,7 +58,7 @@ export default function SellerDashboardPage() {
                 href="/seller/materials/new"
               >
                 <UploadIcon />
-                教材を作成する
+                無料教材を投稿する
               </Link>
               <Link
                 className="inline-flex min-h-12 items-center justify-center border border-[var(--line-strong)] bg-[#FCFCFA] text-sm font-bold"
@@ -68,7 +68,7 @@ export default function SellerDashboardPage() {
               </Link>
             </div>
             <p className="mt-5 text-xs leading-6 text-[var(--ink-soft)]">
-              Phase 2では招待制の出品者ベータを想定。公開前に必ず運営レビューを通します。
+              Phase 2では招待制の投稿者ベータを想定。公開前に必ず運営レビューを通します。
             </p>
           </aside>
 
@@ -92,9 +92,10 @@ export default function SellerDashboardPage() {
                   <h3 className="mt-3 text-2xl font-black">{submission.title}</h3>
                   <p className="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
                     {submission.category} / {submission.licenseLabel} /{" "}
-                    {submission.priceYen === 0
-                      ? "無料"
-                      : `¥${submission.priceYen.toLocaleString()}`}
+                    無料公開
+                    {submission.futurePriceYen
+                      ? ` / 将来価格案 ¥${submission.futurePriceYen.toLocaleString()}`
+                      : ""}
                   </p>
                   <p className="mt-2 text-xs leading-6 text-[var(--ink-soft)]">
                     {submission.reviewNote}

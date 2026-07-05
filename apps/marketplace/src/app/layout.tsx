@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "支援プログラムLab Marketplace",
-  description: "福祉事業所向けプログラム教材の共有・販売プラットフォーム",
+  description: "福祉事業所向けプログラム教材の無料共有プラットフォーム",
 };
 
 export default function RootLayout({

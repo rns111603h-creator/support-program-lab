@@ -9,7 +9,7 @@ const navItems = [
   { key: "top", en: "TOP", label: "トップ", href: "/" },
   { key: "materials", en: "LIBRARY", label: "教材", href: "/materials" },
   { key: "library", en: "MY", label: "保存済み", href: "/library" },
-  { key: "seller", en: "SELLER", label: "投稿", href: "/seller" },
+  { key: "seller", en: "POST", label: "投稿", href: "/seller" },
   { key: "review", en: "REVIEW", label: "審査", href: "/admin/review" },
 ] as const;
 

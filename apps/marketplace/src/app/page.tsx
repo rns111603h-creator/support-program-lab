@@ -10,7 +10,8 @@ export default function Home() {
   const bundlePricing = calculateBundleDisplay({
     bundlePriceYen: featuredBundle.priceYen,
     materialPricesYen: featuredBundle.materialIds.map(
-      (materialId) => materials.find((material) => material.id === materialId)?.priceYen ?? 0,
+      (materialId) =>
+        materials.find((material) => material.id === materialId)?.futurePriceYen ?? 0,
     ),
   });
 
@@ -49,7 +50,7 @@ export default function Home() {
               className="inline-flex min-h-14 items-center border border-[var(--line-strong)] bg-[var(--paper)] px-8 text-sm font-bold tracking-[0.14em] text-[var(--foreground)]"
               href="/seller"
             >
-              出品者モック
+              投稿者モック
             </Link>
           </div>
         </div>
@@ -65,11 +66,11 @@ export default function Home() {
           </p>
           <dl className="mt-5 grid grid-cols-3 gap-2 text-sm">
             <div className="border border-[var(--line)] bg-[#FCFCFA] p-3">
-              <dt className="text-xs text-[var(--ink-soft)]">単品合計</dt>
+              <dt className="text-xs text-[var(--ink-soft)]">将来単品合計</dt>
               <dd className="mt-1 font-black">¥{bundlePricing.singleTotalYen.toLocaleString()}</dd>
             </div>
             <div className="border border-[var(--line)] bg-[#FCFCFA] p-3">
-              <dt className="text-xs text-[var(--ink-soft)]">将来セット</dt>
+              <dt className="text-xs text-[var(--ink-soft)]">将来セット案</dt>
               <dd className="mt-1 font-black">¥{bundlePricing.bundlePriceYen.toLocaleString()}</dd>
             </div>
             <div className="border border-[var(--line)] bg-[#FCFCFA] p-3">
