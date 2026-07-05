@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { LicenseBadges } from "@/components/license-badges";
-import { demoEntitlements, materials } from "@/lib/catalog";
+import { communityMaterials, demoEntitlements } from "@/lib/catalog";
 import { getLibraryMaterials } from "@/lib/marketplace";
 
 export default function LibraryPage() {
   const libraryMaterials = getLibraryMaterials({
     buyerId: "demo-buyer",
     entitlements: demoEntitlements,
-    materials,
+    materials: communityMaterials,
   });
 
   return (
@@ -24,7 +24,7 @@ export default function LibraryPage() {
           <h1 className="mt-3 text-4xl font-black">マイライブラリ</h1>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--ink-soft)]">
             デモ購入者に付与された教材単位の購入権限を表示しています。単品購入でもセット購入でも、
-            最終的にはこの一覧から教材ごとに再ダウンロードできる設計です。
+            最終的にはこの一覧から教材ごとに再ダウンロードできる設計です。現在は全教材を無料で入手できます。
           </p>
         </header>
 
@@ -52,7 +52,7 @@ export default function LibraryPage() {
                   教材詳細
                 </Link>
                 <button className="min-h-11 border border-[var(--line)] bg-[#f3efe5] text-sm font-bold text-[var(--foreground)]">
-                  ダウンロード準備中
+                  無料ダウンロード
                 </button>
               </div>
             </article>

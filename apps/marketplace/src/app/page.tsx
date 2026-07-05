@@ -20,7 +20,7 @@ export default function Home() {
             支援プログラムLab
           </Link>
           <nav className="flex items-center gap-5 text-sm font-semibold text-[var(--ink-soft)]">
-            <Link href="#materials">教材</Link>
+            <Link href="/materials">教材</Link>
             <Link href="#bundles">セット</Link>
             <Link href="/seller">出品者</Link>
             <Link href="/admin/review">審査</Link>
@@ -40,13 +40,13 @@ export default function Home() {
             安全に共有する土台。
           </h1>
           <p className="mt-7 max-w-2xl text-base leading-8 text-[var(--ink-soft)]">
-            Phase 1では、無料教材のライブラリ、ライセンス表示、購入権限に基づく再ダウンロード導線を先に作ります。
-            有料販売と出品者審査へ拡張できる本番アプリの入口です。
+            まずはすべての教材を無料で共有できる場所として育てます。
+            有料販売と決済の土台は残しながら、投稿・コメント・いいねで教材が見つかる体験を先に作ります。
           </p>
           <div className="mt-9 flex flex-wrap gap-3">
             <Link
               className="inline-flex min-h-12 items-center bg-[#31302c] px-6 text-sm font-bold text-white"
-              href="#materials"
+              href="/materials"
             >
               教材を見る
             </Link>
@@ -67,7 +67,7 @@ export default function Home() {
 
         <aside className="border border-[var(--line)] bg-[var(--paper)] p-6 shadow-[0_24px_80px_rgba(49,48,44,0.08)]">
           <p className="text-xs font-black tracking-[0.18em] text-[var(--indigo)]">
-            NEXT: BUNDLE PURCHASE
+            FUTURE: BUNDLE PURCHASE
           </p>
           <h2 className="mt-4 text-2xl font-black">{featuredBundle.title}</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
@@ -79,7 +79,7 @@ export default function Home() {
               <dd className="mt-1 font-black">¥{bundlePricing.singleTotalYen.toLocaleString()}</dd>
             </div>
             <div className="bg-[#f3efe5] p-3">
-              <dt className="text-xs text-[var(--ink-soft)]">セット</dt>
+              <dt className="text-xs text-[var(--ink-soft)]">将来セット</dt>
               <dd className="mt-1 font-black">¥{bundlePricing.bundlePriceYen.toLocaleString()}</dd>
             </div>
             <div className="bg-[#f3efe5] p-3">
@@ -131,10 +131,10 @@ export default function Home() {
       <section id="bundles" className="mx-auto max-w-7xl px-6 py-12 pb-20">
         <div className="border border-[var(--line)] bg-[#31302c] p-8 text-white">
           <p className="text-xs font-black tracking-[0.18em] text-[#d8bf80]">BUNDLE MODEL</p>
-          <h2 className="mt-3 text-3xl font-black">セット販売は、同一出品者の承認済み教材から開始</h2>
+          <h2 className="mt-3 text-3xl font-black">セット販売は後で実装。いまは教材を無料で広げる</h2>
           <p className="mt-4 max-w-3xl text-sm leading-8 text-[#e9e3d7]">
-            Phase 1では購入処理はまだ行いませんが、セット商品の見せ方と価格計算は先に実装済みです。
-            次のPhaseで、購入後に含まれる全教材へダウンロード権限を発行します。
+            価格計算や購入権限のロジックは残したまま、表示上は無料共有を優先します。
+            教材フィードで利用者の反応を集めたあと、必要に応じて単品販売やセット販売に拡張します。
           </p>
         </div>
       </section>

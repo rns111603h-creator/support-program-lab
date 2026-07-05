@@ -3,8 +3,10 @@ import {
   buildLicenseBadges,
   calculateBundleDisplay,
   createEntitlementsForPurchase,
+  getFreeCommunityMaterials,
   getLibraryMaterials,
   getReviewQueue,
+  sortCommunityMaterials,
   summarizeSellerSubmissions,
 } from "../src/lib/marketplace";
 
@@ -196,5 +198,64 @@ describe("summarizeSellerSubmissions", () => {
       approved: 1,
       rejected: 1,
     });
+  });
+});
+
+describe("getFreeCommunityMaterials", () => {
+  it("returns only materials that are currently free to download", () => {
+    const posts = getFreeCommunityMaterials([
+      {
+        id: "free_1",
+        title: "挨拶と第一印象",
+        priceYen: 0,
+        likes: 24,
+        comments: [],
+        publishedAt: "2026-07-04",
+      },
+      {
+        id: "future_paid_1",
+        title: "面接準備の入口",
+        priceYen: 1800,
+        likes: 11,
+        comments: [],
+        publishedAt: "2026-07-03",
+      },
+    ]);
+
+    expect(posts.map((post) => post.id)).toEqual(["free_1"]);
+  });
+});
+
+describe("sortCommunityMaterials", () => {
+  it("sorts by engagement with likes and comments", () => {
+    const posts = sortCommunityMaterials(
+      [
+        {
+          id: "newer_low_engagement",
+          title: "予定管理の基本",
+          priceYen: 0,
+          likes: 4,
+          comments: [{ authorName: "職員A", body: "導入に使えそうです。" }],
+          publishedAt: "2026-07-05",
+        },
+        {
+          id: "older_high_engagement",
+          title: "報告・連絡・相談",
+          priceYen: 0,
+          likes: 18,
+          comments: [
+            { authorName: "職員B", body: "場面カードがわかりやすい。" },
+            { authorName: "職員C", body: "B型でも使えそう。" },
+          ],
+          publishedAt: "2026-07-04",
+        },
+      ],
+      "popular",
+    );
+
+    expect(posts.map((post) => post.id)).toEqual([
+      "older_high_engagement",
+      "newer_low_engagement",
+    ]);
   });
 });

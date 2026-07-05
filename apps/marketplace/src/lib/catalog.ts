@@ -13,6 +13,15 @@ export type MarketplaceMaterial = {
   includedFiles: string[];
   priceYen: number;
   accessType: "free" | "paid-preview";
+  authorAvatar: string;
+  coverTone: "gold" | "olive" | "indigo" | "rose" | "slate";
+  likes: number;
+  comments: {
+    authorName: string;
+    body: string;
+  }[];
+  publishedAt: string;
+  futurePriceYen?: number;
   license: LicenseInput;
 };
 
@@ -41,6 +50,20 @@ export const materials: MarketplaceMaterial[] = [
     includedFiles: ["講師用台本", "利用者ワーク", "振り返りシート", "実施記録文例"],
     priceYen: 0,
     accessType: "free",
+    authorAvatar: "公",
+    coverTone: "gold",
+    likes: 42,
+    comments: [
+      {
+        authorName: "就労移行 支援員",
+        body: "初回の導入で使いやすく、緊張が強い方にも説明しやすかったです。",
+      },
+      {
+        authorName: "B型 生活支援員",
+        body: "振り返りシートだけ単独でも活用できました。",
+      },
+    ],
+    publishedAt: "2026-07-04",
     license: {
       allowModification: true,
       requireCredit: true,
@@ -61,6 +84,16 @@ export const materials: MarketplaceMaterial[] = [
     includedFiles: ["場面カード", "講師用台本", "利用者ワーク", "実施記録文例"],
     priceYen: 0,
     accessType: "free",
+    authorAvatar: "公",
+    coverTone: "indigo",
+    likes: 36,
+    comments: [
+      {
+        authorName: "サービス管理責任者",
+        body: "報連相の違いを短時間で確認できる構成がよいです。",
+      },
+    ],
+    publishedAt: "2026-07-03",
     license: {
       allowModification: true,
       requireCredit: true,
@@ -81,6 +114,90 @@ export const materials: MarketplaceMaterial[] = [
     includedFiles: ["予算ワーク", "買い物前チェック", "講師用台本", "記録文例"],
     priceYen: 0,
     accessType: "free",
+    authorAvatar: "公",
+    coverTone: "olive",
+    likes: 29,
+    comments: [
+      {
+        authorName: "生活訓練スタッフ",
+        body: "金銭の話を責める雰囲気にせず進められました。",
+      },
+    ],
+    publishedAt: "2026-07-02",
+    license: {
+      allowModification: true,
+      requireCredit: true,
+      hasEditableFile: true,
+    },
+  },
+];
+
+export const communityMaterials: MarketplaceMaterial[] = [
+  ...materials,
+  {
+    id: "question-template",
+    slug: "question-template",
+    title: "質問の仕方テンプレート",
+    category: "コミュニケーション",
+    sellerName: "就労支援サンプル事業所",
+    summary: "「ここまでできました」「この先がわかりません」を短く伝える練習教材です。",
+    description:
+      "質問が苦手な利用者向けに、状況を整理して短く伝えるための文例とワークをまとめています。職員が問い詰める進行にならないよう、選択肢を増やす構成にしています。",
+    durationMinutes: 45,
+    targetServices: ["就労移行", "就労継続A型", "就労継続B型"],
+    includedFiles: ["質問テンプレート", "場面カード", "講師メモ"],
+    priceYen: 0,
+    futurePriceYen: 1800,
+    accessType: "free",
+    authorAvatar: "就",
+    coverTone: "rose",
+    likes: 51,
+    comments: [
+      {
+        authorName: "就労定着 支援員",
+        body: "実習前の練習にちょうどよさそうです。",
+      },
+      {
+        authorName: "B型 職業指導員",
+        body: "作業場面カードを増やして使ってみます。",
+      },
+      {
+        authorName: "相談支援専門員",
+        body: "相談先を選ぶワークにも展開できそう。",
+      },
+    ],
+    publishedAt: "2026-07-05",
+    license: {
+      allowModification: true,
+      requireCredit: true,
+      hasEditableFile: true,
+    },
+  },
+  {
+    id: "sleep-rhythm-sheet",
+    slug: "sleep-rhythm-sheet",
+    title: "睡眠リズムを整える週間シート",
+    category: "生活管理",
+    sellerName: "アソシア教材チーム",
+    summary: "起床、就寝、通所への影響を見える化し、無理のない一つの工夫を決めます。",
+    description:
+      "睡眠の問題を本人責任にせず、生活の流れを一緒に確認するための週間シートです。医療的判断はせず、相談につなげる観点も含めています。",
+    durationMinutes: 60,
+    targetServices: ["生活訓練", "就労移行", "就労継続B型"],
+    includedFiles: ["週間シート", "講師メモ", "振り返り欄"],
+    priceYen: 0,
+    futurePriceYen: 1200,
+    accessType: "free",
+    authorAvatar: "ア",
+    coverTone: "slate",
+    likes: 18,
+    comments: [
+      {
+        authorName: "生活訓練スタッフ",
+        body: "通院や服薬の話題に踏み込みすぎない点が使いやすいです。",
+      },
+    ],
+    publishedAt: "2026-07-01",
     license: {
       allowModification: true,
       requireCredit: true,
@@ -117,6 +234,24 @@ export const demoEntitlements = [
     id: "demo:report-contact-consult",
     buyerId: "demo-buyer",
     materialId: "report-contact-consult",
+    sourcePurchaseId: "free_access",
+  },
+  {
+    id: "demo:basic-money-management",
+    buyerId: "demo-buyer",
+    materialId: "basic-money-management",
+    sourcePurchaseId: "free_access",
+  },
+  {
+    id: "demo:question-template",
+    buyerId: "demo-buyer",
+    materialId: "question-template",
+    sourcePurchaseId: "free_access",
+  },
+  {
+    id: "demo:sleep-rhythm-sheet",
+    buyerId: "demo-buyer",
+    materialId: "sleep-rhythm-sheet",
     sourcePurchaseId: "free_access",
   },
 ];

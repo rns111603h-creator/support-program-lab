@@ -32,6 +32,17 @@ export type SellerSubmission = {
   updatedAt: string;
 };
 
+export type CommunityComment = {
+  authorName: string;
+  body: string;
+};
+
+export type CommunityMaterial = MaterialSummary & {
+  likes: number;
+  comments: CommunityComment[];
+  publishedAt: string;
+};
+
 export type PurchaseInput =
   | {
       type: "material";
@@ -125,4 +136,25 @@ export function summarizeSellerSubmissions(submissions: SellerSubmission[]) {
       rejected: 0,
     } satisfies Record<SubmissionStatus, number>,
   );
+}
+
+export function getFreeCommunityMaterials<TMaterial extends CommunityMaterial>(
+  materials: TMaterial[],
+): TMaterial[] {
+  return materials.filter((material) => material.priceYen === 0);
+}
+
+export function sortCommunityMaterials<TMaterial extends CommunityMaterial>(
+  materials: TMaterial[],
+  sort: "new" | "popular",
+): TMaterial[] {
+  return materials.toSorted((a, b) => {
+    if (sort === "new") {
+      return b.publishedAt.localeCompare(a.publishedAt);
+    }
+
+    const aScore = a.likes + a.comments.length * 3;
+    const bScore = b.likes + b.comments.length * 3;
+    return bScore - aScore || b.publishedAt.localeCompare(a.publishedAt);
+  });
 }
