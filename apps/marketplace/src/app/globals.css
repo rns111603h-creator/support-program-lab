@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+:root {
+  --background: #faf9f5;
+  --foreground: #3c3c3c;
+  --paper: #ffffff;
+  --ink-soft: #77776f;
+  --muted: #9c9c96;
+  --line: #ecece7;
+  --line-strong: #c9c9c2;
+  --gold: #c2a15d;
+  --olive: #aeb438;
+  --indigo: #6e7f8d;
+  --blue-soft: #8ca0b3;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family:
+    "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", "YuGothic",
+    "Noto Sans JP", system-ui, sans-serif;
+  letter-spacing: 0;
+}
+
+a {
+  text-decoration: none;
+}
+
+::selection {
+  background: rgba(194, 161, 93, 0.24);
+}
+
+.font-en {
+  font-family: "Jost", system-ui, sans-serif;
+}
