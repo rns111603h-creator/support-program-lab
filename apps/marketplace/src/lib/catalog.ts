@@ -11,6 +11,7 @@ export type MarketplaceMaterial = {
   durationMinutes: number;
   targetServices: string[];
   includedFiles: string[];
+  supportItems?: string[];
   priceYen: number;
   accessType: "free" | "paid-preview";
   authorAvatar: string;
@@ -47,7 +48,8 @@ export const materials: MarketplaceMaterial[] = [
       "初回プログラムでも使いやすい、講師用台本・利用者ワーク・振り返りシートのセットです。緊張が強い利用者にも配慮し、視線や声量を一律に求めすぎない進行にしています。",
     durationMinutes: 45,
     targetServices: ["就労移行", "就労継続B型", "生活訓練"],
-    includedFiles: ["講師用台本", "利用者ワーク", "振り返りシート", "実施記録文例"],
+    includedFiles: ["講師用台本", "利用者ワーク", "振り返りシート"],
+    supportItems: ["記録の書き方例"],
     priceYen: 0,
     accessType: "free",
     authorAvatar: "公",
@@ -81,7 +83,8 @@ export const materials: MarketplaceMaterial[] = [
       "報告・連絡・相談の違いを、現場で起こりやすい短い場面カードで練習します。相談できなかった経験を責めず、次に使える選択肢を増やす構成です。",
     durationMinutes: 60,
     targetServices: ["就労移行", "就労継続A型", "就労継続B型"],
-    includedFiles: ["場面カード", "講師用台本", "利用者ワーク", "実施記録文例"],
+    includedFiles: ["場面カード", "講師用台本", "利用者ワーク"],
+    supportItems: ["記録の書き方例"],
     priceYen: 0,
     accessType: "free",
     authorAvatar: "公",
@@ -111,7 +114,8 @@ export const materials: MarketplaceMaterial[] = [
       "給料日後の困りごとを題材に、必要な支払いを先に確認する流れを練習します。本人責任として扱いすぎず、予防の仕組みづくりに焦点を当てます。",
     durationMinutes: 60,
     targetServices: ["就労移行", "就労継続B型", "生活訓練"],
-    includedFiles: ["予算ワーク", "買い物前チェック", "講師用台本", "記録文例"],
+    includedFiles: ["予算ワーク", "買い物前チェック", "講師用台本"],
+    supportItems: ["記録の書き方例"],
     priceYen: 0,
     accessType: "free",
     authorAvatar: "公",
@@ -262,6 +266,7 @@ export type Phase2Submission = SellerSubmission & {
   licenseLabel: string;
   riskFlags: string[];
   includedFiles: string[];
+  supportItems?: string[];
   reviewNote: string;
 };
 
@@ -302,7 +307,8 @@ export const demoSellerSubmissions: Phase2Submission[] = [
     priceYen: 2200,
     licenseLabel: "現場で編集OK",
     riskFlags: ["価格あり"],
-    includedFiles: ["朝の手順ワーク", "連絡文テンプレート", "実施記録文例"],
+    includedFiles: ["朝の手順ワーク", "連絡文テンプレート"],
+    supportItems: ["記録の書き方例"],
     reviewNote: "遅刻を責める表現になっていないか重点確認。",
   },
   {

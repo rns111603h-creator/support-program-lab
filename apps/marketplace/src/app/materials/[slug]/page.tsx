@@ -71,6 +71,20 @@ export default async function MaterialPage({
               </div>
             </div>
 
+            {material.supportItems && material.supportItems.length > 0 ? (
+              <div className="mt-4 border border-[var(--line)] bg-[#fbf8f0] p-4">
+                <h2 className="text-sm font-black">補助資料</h2>
+                <p className="mt-2 text-xs leading-6 text-[var(--ink-soft)]">
+                  教材実施後に必要な場合だけ参照する付属資料です。教材そのものの主役にはしていません。
+                </p>
+                <ul className="mt-3 space-y-2 text-sm text-[var(--ink-soft)]">
+                  {material.supportItems.map((item) => (
+                    <li key={item}>・{item}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+
             {material.comments.length > 0 ? (
               <section className="mt-8 border-t border-[var(--line)] pt-6">
                 <h2 className="text-lg font-black">コメント</h2>

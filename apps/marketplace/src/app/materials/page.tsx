@@ -125,9 +125,11 @@ export default function MaterialsFeedPage() {
             <li>・講師用台本</li>
             <li>・利用者ワーク</li>
             <li>・振り返りシート</li>
-            <li>・実施記録文例</li>
             <li>・PPT / Word / Canva 用データ</li>
           </ul>
+          <p className="mt-4 border-l-4 border-[var(--line)] bg-[#f8f4ea] px-4 py-3 text-xs leading-6 text-[var(--ink-soft)]">
+            記録の書き方例は、必要な教材にだけ付属資料として添える想定です。
+          </p>
           <Link
             className="mt-6 inline-flex min-h-11 w-full items-center justify-center bg-[#31302c] text-sm font-bold text-white"
             href="/seller/materials/new"
