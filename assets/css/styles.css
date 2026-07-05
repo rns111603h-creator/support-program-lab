@@ -471,9 +471,9 @@ h3 {
 /* ===== material pages (printable kits) ===== */
 
 .material-page {
-  max-width: 860px;
+  max-width: 920px;
   margin: 0 auto;
-  padding: 56px 28px;
+  padding: 56px 28px 84px;
   background: var(--paper);
 }
 
@@ -487,6 +487,147 @@ h3 {
   margin-top: 34px;
   padding-top: 24px;
   border-top: 1px solid var(--line);
+}
+
+.material-cover {
+  display: grid;
+  gap: 24px;
+  padding: 34px;
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(135deg, rgba(194, 199, 204, 0.18), transparent 36%),
+    var(--paper);
+}
+
+.material-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0 0;
+}
+
+.material-meta span,
+.worksheet-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 3px 10px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  background: var(--paper-strong);
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+}
+
+.material-note {
+  padding: 18px 20px;
+  border-left: 3px solid var(--accent);
+  background: var(--paper-strong);
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.material-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.material-box {
+  padding: 18px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+}
+
+.material-box h3 {
+  margin-bottom: 8px;
+}
+
+.timeline-table th:first-child {
+  width: 88px;
+}
+
+.script-block {
+  display: grid;
+  gap: 10px;
+}
+
+.script-line {
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  background: var(--paper-strong);
+}
+
+.script-line strong {
+  color: var(--nordic-deep);
+}
+
+.worksheet-page {
+  margin-top: 28px;
+  padding: 28px;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.worksheet-page h2 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.worksheet-field {
+  min-height: 56px;
+  padding: 10px;
+  border: 1px solid #d5d5cc;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 30px,
+      rgba(201, 201, 194, 0.65) 31px
+    );
+}
+
+.worksheet-field.tall {
+  min-height: 116px;
+}
+
+.choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.choice {
+  min-height: 42px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  background: var(--paper-strong);
+}
+
+.choice::before {
+  content: "□";
+  margin-right: 8px;
+  color: var(--nordic-mid);
+}
+
+.record-example {
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  background: var(--paper-strong);
+  color: var(--muted);
+}
+
+.page-break {
+  break-before: page;
+  page-break-before: always;
+}
+
+.avoid-break {
+  break-inside: avoid;
+  page-break-inside: avoid;
 }
 
 table {
@@ -608,6 +749,7 @@ th {
   .hero-grid,
   .grid,
   .two-column,
+  .material-grid,
   .library-tools {
     grid-template-columns: 1fr;
   }
@@ -655,6 +797,11 @@ th {
 }
 
 @media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
   .site-header,
   .footer,
   .button-row {
@@ -666,6 +813,19 @@ th {
   }
 
   .material-page {
+    max-width: none;
     padding: 0;
+  }
+
+  .material-cover,
+  .material-box,
+  .worksheet-page,
+  .script-line,
+  .record-example {
+    box-shadow: none;
+  }
+
+  a {
+    text-decoration: none;
   }
 }
