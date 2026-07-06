@@ -13,12 +13,12 @@ export default function AdminReviewMockPage() {
         <header className="mt-8 grid gap-6 border border-[var(--line)] bg-[var(--paper)] p-8 lg:grid-cols-[1fr_360px]">
           <div>
             <p className="font-en text-xs font-medium tracking-[0.34em] text-[var(--gold)]">
-              ADMIN REVIEW MOCK
+              ADMIN REVIEW
             </p>
             <h1 className="mt-3 text-4xl font-normal">運営審査キュー</h1>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--ink-soft)]">
-              Phase 2では、投稿された教材をすぐ公開せず、著作権・個人情報・表現・ライセンスを確認する運営画面を見せます。
-              実際の承認処理はまだ行わないプロトタイプで、公開は無料教材のみを対象にします。
+              投稿された教材はすぐ公開せず、著作権・個人情報・表現・ライセンスを確認します。
+              現在の公開対象は無料教材です。
             </p>
           </div>
           <div className="border border-[var(--line)] bg-[#FCFCFA] p-5">
@@ -92,13 +92,13 @@ export default function AdminReviewMockPage() {
                 </p>
                 <div className="mt-6 grid gap-3">
                   <button className="min-h-11 bg-emerald-700 text-sm font-bold text-white">
-                    承認予定
+                    承認する
                   </button>
                   <button className="min-h-11 border border-rose-200 bg-rose-50 text-sm font-bold text-rose-700">
-                    差し戻し予定
+                    差し戻す
                   </button>
                   <button className="min-h-11 border border-[var(--line)] bg-[var(--paper)] text-sm font-bold">
-                    法務確認へ回す予定
+                    法務確認へ回す
                   </button>
                 </div>
               </aside>

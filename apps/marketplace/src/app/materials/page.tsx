@@ -43,8 +43,8 @@ export default function MaterialsFeedPage() {
             </p>
             <h1 className="mt-3 text-4xl font-normal leading-[1.45]">みんなの教材</h1>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-              支援者や事業所が投稿した教材を、noteのように一覧で読めます。
-              現在はすべて無料で閲覧・ダウンロードできます。いいね、コメント、保存の反応を集めながら、後の有料版に育てます。
+              支援者や事業所が投稿した教材を、実践テーマごとに探せます。
+              現在は無料公開を中心に、閲覧・保存・ダウンロードのしやすさを優先しています。
             </p>
             <div className="mt-5 grid gap-2 text-sm md:grid-cols-3">
               <Metric label="無料教材" value={`${freeMaterials.length}件`} />
@@ -115,11 +115,11 @@ export default function MaterialsFeedPage() {
                       {material.downloads}
                     </span>
                     <span className="bg-emerald-50 px-2.5 py-1 text-xs text-emerald-700">
-                      無料で入手できます
+                      {material.downloadUrl ? "資料ダウンロード可" : "無料で閲覧できます"}
                     </span>
                     {material.futurePriceYen ? (
                       <span className="text-xs text-[var(--muted)]">
-                        将来価格案 ¥{material.futurePriceYen.toLocaleString()}（未実装）
+                        将来価格案 ¥{material.futurePriceYen.toLocaleString()}
                       </span>
                     ) : null}
                   </div>
@@ -157,7 +157,7 @@ export default function MaterialsFeedPage() {
         <aside className="h-fit border border-[var(--line)] bg-[var(--paper)] p-5 lg:sticky lg:top-6">
           <h2 className="text-lg font-black">無料で共有する</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-            まずは現場で使える教材を集める段階です。価格設定は後から検証し、いまは投稿も入手も無料にします。
+            現場で使える教材を投稿し、支援者同士で活用方法を共有できます。公開中の教材は無料で閲覧できます。
           </p>
           <ul className="mt-4 space-y-3 text-sm leading-7 text-[var(--ink-soft)]">
             {["講師用台本", "利用者ワーク", "振り返りシート", "PPT / Word / Canva 用データ"].map((item) => (
@@ -168,7 +168,7 @@ export default function MaterialsFeedPage() {
             ))}
           </ul>
           <p className="mt-4 border-l-4 border-[var(--line-strong)] bg-[#FCFCFA] px-4 py-3 text-xs leading-6 text-[var(--ink-soft)]">
-            個人情報、支援記録、他者著作物が混ざらないよう、公開前に運営が審査する想定です。
+            個人情報、支援記録、他者著作物が混ざらないよう、公開前に運営が確認します。
           </p>
           <Link
             className="mt-6 inline-flex min-h-11 w-full items-center justify-center gap-2 bg-[var(--foreground)] text-sm font-bold tracking-[0.12em] text-white"
@@ -178,7 +178,7 @@ export default function MaterialsFeedPage() {
             教材を投稿する
           </Link>
           <p className="mt-4 text-xs leading-6 text-[var(--ink-soft)]">
-            有料販売、単品購入、セット販売は後の実装として残します。最初の目的は投稿者と利用者を増やすことです。
+            有料販売、単品購入、セット販売は今後の拡張として準備します。現在は無料共有を優先しています。
           </p>
         </aside>
       </div>

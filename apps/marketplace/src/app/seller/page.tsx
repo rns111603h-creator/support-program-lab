@@ -33,11 +33,11 @@ export default function SellerDashboardPage() {
         <header className="mt-8 grid gap-6 border border-[var(--line)] bg-[var(--paper)] p-8 lg:grid-cols-[1fr_360px]">
           <div>
             <p className="font-en text-xs font-medium tracking-[0.34em] text-[var(--gold)]">
-              CREATOR BETA MOCK
+              CREATOR DASHBOARD
             </p>
             <h1 className="mt-3 text-4xl font-normal">投稿者ダッシュボード</h1>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--ink-soft)]">
-              教材を下書きし、無料公開の設定、ファイル構成、ライセンスを確認して、運営審査へ提出する流れのプロトタイプです。
+              教材を下書きし、無料公開の設定、ファイル構成、ライセンスを確認して、運営審査へ提出できます。
               有料販売は後の実装として残し、いまは投稿者と利用者を増やす設計にしています。
             </p>
           </div>
@@ -68,7 +68,7 @@ export default function SellerDashboardPage() {
               </Link>
             </div>
             <p className="mt-5 text-xs leading-6 text-[var(--ink-soft)]">
-              Phase 2では招待制の投稿者ベータを想定。公開前に必ず運営レビューを通します。
+              投稿された教材は、公開前に必ず運営レビューを通します。
             </p>
           </aside>
 
@@ -102,7 +102,7 @@ export default function SellerDashboardPage() {
                   </p>
                 </div>
                 <button className="min-h-11 self-center border border-[var(--line-strong)] bg-[#FCFCFA] text-sm font-bold">
-                  編集モック
+                  編集する
                 </button>
               </article>
             ))}

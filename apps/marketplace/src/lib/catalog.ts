@@ -24,6 +24,7 @@ export type MarketplaceMaterial = {
   }[];
   publishedAt: string;
   futurePriceYen?: number;
+  downloadUrl?: string;
   license: LicenseInput;
 };
 
@@ -69,6 +70,7 @@ export const materials: MarketplaceMaterial[] = [
       },
     ],
     publishedAt: "2026-07-04",
+    downloadUrl: "/downloads/greeting-first-impression-kit.html",
     license: {
       allowModification: true,
       requireCredit: true,
@@ -102,6 +104,7 @@ export const materials: MarketplaceMaterial[] = [
       },
     ],
     publishedAt: "2026-07-03",
+    downloadUrl: "/downloads/report-contact-consult-kit.html",
     license: {
       allowModification: true,
       requireCredit: true,
@@ -135,6 +138,7 @@ export const materials: MarketplaceMaterial[] = [
       },
     ],
     publishedAt: "2026-07-02",
+    downloadUrl: "/downloads/basic-money-management-kit.html",
     license: {
       allowModification: true,
       requireCredit: true,
@@ -459,7 +463,7 @@ export const demoSellerSubmissions: Phase2Submission[] = [
     riskFlags: [],
     includedFiles: ["講師用台本", "利用者ワーク", "振り返りシート"],
     publishMode: "free_now",
-    reviewNote: "公開済み。Phase 1無料教材として利用中。",
+    reviewNote: "公開済み。無料教材として利用中。",
   },
   {
     id: "rejected_interview",

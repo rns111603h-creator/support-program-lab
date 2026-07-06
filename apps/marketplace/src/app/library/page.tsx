@@ -51,10 +51,24 @@ export default function LibraryPage() {
                 >
                   教材詳細
                 </Link>
-                <button className="inline-flex min-h-11 items-center justify-center gap-2 border border-[var(--line-strong)] bg-[#FCFCFA] text-sm font-bold text-[var(--foreground)]">
-                  <DownloadIcon />
-                  無料ダウンロード
-                </button>
+                {material.downloadUrl ? (
+                  <a
+                    className="inline-flex min-h-11 items-center justify-center gap-2 border border-[var(--line-strong)] bg-[#FCFCFA] text-sm font-bold text-[var(--foreground)]"
+                    href={material.downloadUrl}
+                    download
+                  >
+                    <DownloadIcon />
+                    資料をダウンロード
+                  </a>
+                ) : (
+                  <button
+                    className="inline-flex min-h-11 items-center justify-center gap-2 border border-[var(--line)] bg-[#FCFCFA] text-sm font-bold text-[var(--muted)]"
+                    disabled
+                  >
+                    <DownloadIcon />
+                    資料準備中
+                  </button>
+                )}
               </div>
             </article>
           ))}

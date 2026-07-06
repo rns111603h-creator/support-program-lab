@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MaterialUploadFields } from "@/components/material-upload-fields";
 import { SiteHeader } from "@/components/site-header";
 import { CheckIcon, UploadIcon } from "@/components/ui-icons";
 
@@ -13,12 +14,12 @@ export default function NewMaterialMockPage() {
 
         <header className="mt-8 border border-[var(--line)] bg-[var(--paper)] p-8">
           <p className="font-en text-xs font-medium tracking-[0.34em] text-[var(--gold)]">
-            FREE MATERIAL POST MOCK
+            MATERIAL POST
           </p>
           <h1 className="mt-3 text-4xl font-normal">無料教材を投稿する</h1>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--ink-soft)]">
-            投稿者が自作教材を共有するときの入力項目です。今は保存しない静的モックで、まずは無料公開の流れを確認します。
-            有料販売に必要な価格・決済項目は後の実装として分離します。
+            自作教材を登録し、公開前の確認へ進めます。現在は無料公開を中心に受け付けています。
+            有料販売に必要な価格・決済項目は今後の拡張として管理します。
           </p>
         </header>
 
@@ -29,31 +30,10 @@ export default function NewMaterialMockPage() {
             <Field label="概要" value="わからない時に、何がわからないかを短く伝える練習教材です。" />
             <Field label="本文・使い方" value="対象者、60分の流れ、講師の声かけ、利用者ワークの使い方を本文として入力します。" />
             <Field label="対象サービス" value="就労移行 / 就労継続A型 / 就労継続B型" />
-            <Field label="公開設定" value="無料で公開する（MVPでは有料販売しない）" />
+            <Field label="公開設定" value="無料で公開する（現在は有料販売を受け付けていません）" />
             <Field label="将来の有料版メモ" value="単品価格案 ¥1,800。反応を見て、後で有料版・セット版を検討します。" />
 
-            <div className="grid gap-4 md:grid-cols-[220px_1fr]">
-              <div className="min-h-40 border border-dashed border-[var(--line-strong)] bg-[#FCFCFA] p-5">
-                <p className="text-sm font-black">イメージ画像</p>
-                <p className="mt-3 text-xs leading-6 text-[var(--ink-soft)]">
-                  投稿一覧に表示する表紙画像。未設定の場合はカテゴリ色の教材カードを表示します。
-                </p>
-              </div>
-              <div className="border border-dashed border-[var(--line-strong)] bg-[#FCFCFA] p-5">
-                <p className="text-sm font-black">資料ファイル</p>
-                <ul className="mt-3 space-y-2 text-sm text-[var(--ink-soft)]">
-                  {["講師用進行表.pdf", "利用者ワーク.docx", "場面カード.pptx"].map((file) => (
-                    <li className="flex items-center gap-2" key={file}>
-                      <span className="size-1.5 rounded-full bg-[var(--blue-soft)]" />
-                      {file}
-                    </li>
-                  ))}
-                </ul>
-                <p className="mt-4 text-xs leading-6 text-[var(--ink-soft)]">
-                  実装時はPDF、Word、PowerPoint、画像をアップロードできる想定です。
-                </p>
-              </div>
-            </div>
+            <MaterialUploadFields />
 
             <div className="grid gap-3 border border-[var(--line)] bg-[#FCFCFA] p-5 md:grid-cols-3">
               <MiniPolicy title="利用条件" body="現場で編集OK / クレジット表記あり" />
@@ -69,15 +49,15 @@ export default function NewMaterialMockPage() {
               <Check label="個人情報・支援記録を含まない" />
               <Check label="効果保証の表現を含まない" />
               <Check label="ライセンスは現場で編集OK" />
-              <Check label="MVPでは無料公開として提出" />
+              <Check label="無料公開として提出" />
             </div>
             <div className="mt-6 grid gap-3">
               <button className="inline-flex min-h-12 items-center justify-center gap-2 bg-[var(--foreground)] text-sm font-bold tracking-[0.12em] text-white">
                 <UploadIcon />
-                審査提出予定
+                審査へ提出
               </button>
               <button className="min-h-12 border border-[var(--line-strong)] bg-[#FCFCFA] text-sm font-bold">
-                下書き保存予定
+                下書き保存
               </button>
             </div>
             <p className="mt-5 border-l-4 border-[var(--line-strong)] bg-[#FCFCFA] px-4 py-3 text-xs leading-6 text-[var(--ink-soft)]">

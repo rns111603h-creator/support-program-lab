@@ -50,7 +50,7 @@ export default function Home() {
               className="inline-flex min-h-14 items-center border border-[var(--line-strong)] bg-[var(--paper)] px-8 text-sm font-bold tracking-[0.14em] text-[var(--foreground)]"
               href="/seller"
             >
-              投稿者モック
+              教材を投稿する
             </Link>
           </div>
         </div>
@@ -87,7 +87,7 @@ export default function Home() {
             <p className="font-en text-xs font-medium tracking-[0.34em] text-[var(--gold)]">
               MATERIALS
             </p>
-            <h2 className="mt-2 text-3xl font-black">無料MVP教材</h2>
+            <h2 className="mt-2 text-3xl font-black">無料公開教材</h2>
           </div>
           <p className="hidden max-w-md text-sm leading-7 text-[var(--ink-soft)] md:block">
             ここに並ぶ教材は、将来の無料公開・単品販売・セット販売で同じデータ構造を使います。

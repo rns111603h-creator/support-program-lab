@@ -110,7 +110,7 @@ export default async function MaterialPage({
                   <div>
                     <h2 className="text-lg font-black">コメント</h2>
                     <p className="mt-1 text-xs leading-6 text-[var(--ink-soft)]">
-                      実際の実装ではログイン利用者が感想や活用メモを投稿できます。
+                      現場での使い方や補足アイデアを共有できます。
                     </p>
                   </div>
                   <button className="inline-flex min-h-10 items-center gap-2 border border-[var(--line-strong)] bg-[#FCFCFA] px-4 text-xs font-bold">
@@ -143,26 +143,37 @@ export default async function MaterialPage({
               無料
             </p>
             <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
-              現在はすべての教材を無料で入手できます。将来の有料化に備えた価格・決済設計は保持しています。
+              公開中の教材は無料で閲覧できます。資料ファイルがある教材は、このページからダウンロードできます。
             </p>
             {material.futurePriceYen ? (
               <div className="mt-4 border border-[var(--line)] bg-[#FCFCFA] p-4">
-                <p className="text-xs font-black text-[var(--ink-soft)]">将来の有料版メモ</p>
+                <p className="text-xs font-black text-[var(--ink-soft)]">今後の提供</p>
                 <p className="mt-1 text-sm font-black">
                   単品価格案 ¥{material.futurePriceYen.toLocaleString()}
                 </p>
                 <p className="mt-2 text-xs leading-6 text-[var(--ink-soft)]">
-                  MVPでは課金せず、無料利用と反応データを優先します。
+                  現在は無料公開中です。将来の有料版では追加資料やセット提供を検討します。
                 </p>
               </div>
             ) : null}
-            <Link
-              className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 bg-[var(--foreground)] text-sm font-bold tracking-[0.12em] text-white"
-              href="/library"
-            >
-              <DownloadIcon />
-              無料でライブラリに追加
-            </Link>
+            {material.downloadUrl ? (
+              <a
+                className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 bg-[var(--foreground)] text-sm font-bold tracking-[0.12em] text-white"
+                href={material.downloadUrl}
+                download
+              >
+                <DownloadIcon />
+                教材資料をダウンロード
+              </a>
+            ) : (
+              <Link
+                className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 bg-[var(--foreground)] text-sm font-bold tracking-[0.12em] text-white"
+                href="/library"
+              >
+                <DownloadIcon />
+                ライブラリに保存
+              </Link>
+            )}
             <button className="mt-3 inline-flex min-h-12 w-full items-center justify-center gap-2 border border-[var(--line-strong)] bg-[#FCFCFA] text-sm font-bold">
               <HeartIcon />
               いいね
