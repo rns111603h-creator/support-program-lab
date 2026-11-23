@@ -3,6 +3,7 @@ import XCTest
 @testable import ProgramKit
 
 final class ProgramRepositoryTests: XCTestCase {
+    private enum InjectedFailure: Error { case beforeCommit }
     private var root: URL!
 
     override func setUpWithError() throws {
@@ -294,5 +295,58 @@ final class ProgramRepositoryTests: XCTestCase {
         XCTAssertEqual(try repository.list(), [kept])
         XCTAssertFalse(FileManager.default.fileExists(atPath: url.path))
         assertError(.programNotFound) { try repository.delete(id: deleted.id) }
+    }
+
+    func testLiveAttachmentsRemainAvailableUntilMetadataCommitAndFailurePreservesThem() throws {
+        let repository = try ProgramRepository(root: root)
+        let program = example()
+        try repository.save(program)
+        let payload = Data("中断前にも保持する架空添付".utf8)
+        let attachment = try repository.addAttachment(programID: program.id, filename: "keep.txt", data: payload)
+        let url = try repository.attachmentURL(programID: program.id, attachmentID: attachment.id)
+        let before = try Data(contentsOf: root.appendingPathComponent("programs.json"))
+        var reachedCommit = false
+        repository.beforeIndexCommit = {
+            reachedCommit = true
+            XCTAssertEqual(try Data(contentsOf: url), payload)
+            throw InjectedFailure.beforeCommit
+        }
+        XCTAssertThrowsError(try repository.delete(id: program.id)) { error in
+            XCTAssertTrue(error is InjectedFailure)
+        }
+        XCTAssertTrue(reachedCommit)
+        XCTAssertEqual(try Data(contentsOf: root.appendingPathComponent("programs.json")), before)
+        XCTAssertEqual(try Data(contentsOf: url), payload)
+        XCTAssertEqual(try repository.list().first?.attachments, [attachment])
+    }
+
+    func testRepositoryDoesNotChangeTheChosenOSBackupPolicy() throws {
+        var directory = try XCTUnwrap(root)
+        var policy = URLResourceValues()
+        policy.isExcludedFromBackup = false
+        try directory.setResourceValues(policy)
+        _ = try ProgramRepository(root: directory)
+        XCTAssertEqual(try directory.resourceValues(forKeys: [.isExcludedFromBackupKey]).isExcludedFromBackup, false)
+    }
+
+    func testUnsupportedAttachmentExtensionsAreRejectedInBothDirectAndArchivePaths() throws {
+        let repository = try ProgramRepository(root: root)
+        let existing = example()
+        try repository.save(existing)
+        let before = try Data(contentsOf: root.appendingPathComponent("programs.json"))
+        let bytes = Data("小さな架空添付".utf8)
+        for filename in ["page.html", "script.js", "macro.docm", "executable.sh"] {
+            assertError(.invalidFilename) {
+                try repository.addAttachment(programID: existing.id, filename: filename, data: bytes)
+            }
+            var incoming = example(id: UUID())
+            let attachment = ProgramAttachment(id: UUID(), filename: filename, storedName: "work.txt", sizeBytes: bytes.count)
+            incoming.attachments = [attachment]
+            assertError(.invalidArchive) {
+                try repository.importProgram(data: archive(program: incoming, files: [(attachment.id, bytes)]))
+            }
+        }
+        XCTAssertEqual(try repository.list(), [existing])
+        XCTAssertEqual(try Data(contentsOf: root.appendingPathComponent("programs.json")), before)
     }
 }
