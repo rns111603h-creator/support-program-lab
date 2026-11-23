@@ -5,6 +5,7 @@ import { getCurrentUser } from "@/lib/vault-auth";
 import { AuthForm } from "@/components/vault-forms";
 import { VaultShell, PageIntro, cardClass } from "@/components/vault-ui";
 import { loginAction } from "@/app/vault/actions";
+import { VaultAuthSignal } from "@/components/vault-session-boundary";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -22,6 +23,7 @@ export default async function LoginPage({
     redirect(next && /^\/invite\/[a-zA-Z0-9_-]+$/.test(next) ? next : "/vault");
   return (
     <VaultShell>
+      <VaultAuthSignal />
       <div className="mx-auto max-w-lg">
         <PageIntro eyebrow="WELCOME BACK" title="保管庫にログイン">
           自分とチームの教材を、保存したところから。

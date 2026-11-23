@@ -215,6 +215,59 @@ describe("local rights review", () => {
     expect(report.coverage.join(" ")).toContain("対応XML 2件");
   });
 
+  it.each([
+    ["unfinished tag", "<w:document><w:p><w:t>本文</w:t></w:p><"],
+    ["unfinished comment", "<w:document><!-- コメントの途中"],
+    ["nested tag opener", "<w:document><w:p<<<<</w:document>"],
+    [
+      "unfinished quoted attribute",
+      '<w:document><w:p title="途中>本文</w:p></w:document>',
+    ],
+    ["mismatched closing tag", "<w:document><w:p>本文</w:document>"],
+    ["unfinished entity", "<w:document><w:p>本文 &copy</w:p></w:document>"],
+    ["unfinished element", "<w:document><w:p>本文"],
+    ["unfinished CDATA", "<w:document><![CDATA[途中"],
+    ["unfinished processing instruction", '<?xml version="1.0"'],
+    ["unsupported entity", "<w:document>&toString;</w:document>"],
+    [
+      "unsupported declaration",
+      '<!DOCTYPE w:document SYSTEM "https://example.invalid/dtd"><w:document/>',
+    ],
+  ])("marks small malformed Office XML as unchecked: %s", (_label, xml) => {
+    expect(Buffer.byteLength(xml)).toBeLessThan(200);
+    const data = archive([{ name: "word/document.xml", data: xml }]);
+    const report = checkRights({
+      title: "教材",
+      rightsBasis: "自作",
+      files: [{ name: "unfinished.docx", mimeType: "application/zip", data }],
+    });
+    expect(report.findings.map((finding) => finding.code)).toContain(
+      "office-unchecked",
+    );
+    expect(report.requiresReview).toBe(true);
+    expect(report.coverage.join(" ")).toContain("Office本文は未検査");
+    expect(report.coverage.join(" ")).not.toContain("を文字列検査しました");
+  });
+
+  it("preserves small valid XML with quoted brackets, comments, CDATA and entities", () => {
+    const xml =
+      '<?xml version="1.0"?><w:document><w:p note="a > b &amp; c"><w:t>Copy<!-- note -->right &#xA9; <![CDATA[無断転載禁止]]></w:t></w:p></w:document>';
+    expect(Buffer.byteLength(xml)).toBeLessThan(200);
+    const data = archive([{ name: "word/document.xml", data: xml }]);
+    const report = checkRights({
+      title: "教材",
+      rightsBasis: "確認中",
+      files: [{ name: "text.docx", mimeType: "application/zip", data }],
+    });
+    const findings = report.findings.map((finding) => finding.code);
+    expect(findings).toContain("copyright-notice");
+    expect(findings).toContain("redistribution-restricted");
+    expect(findings).not.toContain("office-unchecked");
+    expect(report.coverage.join(" ")).toContain(
+      "対応XML 1件を文字列検査しました",
+    );
+  });
+
   it("fails closed to unscanned on corrupted Office archives", () => {
     const report = checkRights({
       title: "教材",

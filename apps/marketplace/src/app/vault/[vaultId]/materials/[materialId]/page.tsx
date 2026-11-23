@@ -81,7 +81,11 @@ export default async function MaterialPage({
                 権利の確認メモ、自動確認の結果、保管庫名・チーム名・メンバー情報は表示されません。添付ファイル内のメモや個人情報は、ご自身で確認してください。
               </p>
             </div>
-            <ActionForm action={createShareAction} label="閲覧リンクを発行">
+            <ActionForm
+              key={`share:${materialId}:${material.version}`}
+              action={createShareAction}
+              label="閲覧リンクを発行"
+            >
               <input type="hidden" name="materialId" value={materialId} />
               <input type="hidden" name="version" value={material.version} />
               <label className="grid gap-2 text-sm font-bold">
@@ -169,11 +173,13 @@ export default async function MaterialPage({
               本文・添付を削除し、共有リンクを無効にします。この操作は取り消せません。
             </p>
             <ActionForm
+              key={`delete:${materialId}:${material.version}`}
               action={deleteMaterialAction}
               label="教材を削除"
               confirm="この教材と添付ファイルを削除しますか？元に戻せません。"
             >
               <input type="hidden" name="materialId" value={materialId} />
+              <input type="hidden" name="version" value={material.version} />
             </ActionForm>
           </details>
         </aside>

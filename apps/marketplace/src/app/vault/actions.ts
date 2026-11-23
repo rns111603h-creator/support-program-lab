@@ -230,7 +230,11 @@ export async function deleteMaterialAction(
   try {
     const store = getVaultStore();
     vaultId = store.getMaterial(user.id, value(data, "materialId")).vaultId;
-    store.deleteMaterial(user.id, value(data, "materialId"));
+    store.deleteMaterial(
+      user.id,
+      value(data, "materialId"),
+      Number(value(data, "version")),
+    );
   } catch (error) {
     return fail(error);
   }

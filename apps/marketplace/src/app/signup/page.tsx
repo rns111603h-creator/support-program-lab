@@ -5,6 +5,7 @@ import { getCurrentUser } from "@/lib/vault-auth";
 import { AuthForm } from "@/components/vault-forms";
 import { VaultShell, PageIntro, cardClass } from "@/components/vault-ui";
 import { signupAction } from "@/app/vault/actions";
+import { VaultAuthSignal } from "@/components/vault-session-boundary";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -22,6 +23,7 @@ export default async function SignupPage({
     redirect(next && /^\/invite\/[a-zA-Z0-9_-]+$/.test(next) ? next : "/vault");
   return (
     <VaultShell>
+      <VaultAuthSignal />
       <div className="mx-auto max-w-lg">
         <PageIntro eyebrow="YOUR PROGRAM VAULT" title="自分の保管庫をつくる">
           IDとパスワードを設定すると、非公開の個人保管庫が作成されます。チームの保管庫は、あとから追加できます。

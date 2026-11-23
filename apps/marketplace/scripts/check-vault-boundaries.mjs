@@ -10,7 +10,7 @@ const CODE_EXTENSION = /\.(?:[cm]?[jt]sx?)$/i;
 const ASSET_EXTENSION =
   /\.(?:css|scss|sass|less|svg|png|jpe?g|gif|webp|ico|woff2?|ttf|otf|json)$/i;
 const PRIVATE_MODULE =
-  /^src\/lib\/(?:vault-store|vault-auth|rights-check|vault-download)(?:\.|\/|$)/;
+  /^src\/lib\/(?:vault-store|vault-auth|vault-access|rights-check|vault-download)(?:\.|\/|$)/;
 const NODE_BUILTINS = new Set(
   builtinModules.map((name) => name.replace(/^node:/, "")),
 );

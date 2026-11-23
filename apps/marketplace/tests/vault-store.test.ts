@@ -118,7 +118,7 @@ describe("private vault persistence and authorization", () => {
           expectedVersion: 1,
           title: "侵入",
         }),
-      () => store.deleteMaterial(bob.id, material.id),
+      () => store.deleteMaterial(bob.id, material.id, material.version),
       () => store.getFile(bob.id, material.id, material.files[0].id),
       () =>
         store.createShare(bob.id, material.id, {
@@ -275,7 +275,7 @@ describe("private vault persistence and authorization", () => {
     vi.spyOn(Date, "now").mockReturnValue(Date.now() + 2 * 86_400_000);
     expect(store.getSharedMaterial(share.token)).toBeNull();
     vi.restoreAllMocks();
-    store.deleteMaterial(alice.id, material.id);
+    store.deleteMaterial(alice.id, material.id, material.version);
     expect(store.getSharedMaterial(share.token)).toBeNull();
     expect(store.getSharedFile(share.token, material.files[0].id)).toBeNull();
     const inspection = new DatabaseSync(path.join(directory, "vault.sqlite"));
@@ -286,6 +286,58 @@ describe("private vault persistence and authorization", () => {
       inspection.prepare("SELECT count(*) AS count FROM shares").get()?.count,
     ).toBe(0);
     inspection.close();
+  });
+
+  it("rejects stale team deletions without removing updated content, attachments or active shares", () => {
+    const team = store.createVault(alice.id, "架空の共同編集チーム");
+    store.acceptInvite(bob.id, store.createInvite(alice.id, team.id).token);
+    const original = store.createMaterial(alice.id, team.id, {
+      title: "削除画面を開いた時点の教材",
+      files: [file],
+    });
+    const updated = store.updateMaterial(bob.id, original.id, {
+      expectedVersion: original.version,
+      title: "別メンバーが更新した教材",
+      body: "削除画面を開いた後に追記された架空の内容です。",
+    });
+    const share = store.createShare(bob.id, updated.id, {
+      expectedVersion: updated.version,
+      acknowledged: true,
+    });
+
+    expect(() =>
+      store.deleteMaterial(alice.id, original.id, original.version),
+    ).toThrow(expect.objectContaining({ status: 409 }));
+    expect(store.getMaterial(alice.id, original.id)).toMatchObject({
+      title: updated.title,
+      body: updated.body,
+      version: updated.version,
+      files: original.files,
+    });
+    expect(
+      store.getFile(alice.id, original.id, original.files[0].id).data,
+    ).toEqual(file.data);
+    expect(store.getSharedMaterial(share.token)?.id).toBe(original.id);
+    expect(
+      store.getSharedFile(share.token, original.files[0].id)?.data,
+    ).toEqual(file.data);
+
+    store.deleteMaterial(alice.id, updated.id, updated.version);
+    expect(() => store.getMaterial(alice.id, updated.id)).toThrow(VaultError);
+    expect(store.getSharedMaterial(share.token)).toBeNull();
+    expect(store.getSharedFile(share.token, original.files[0].id)).toBeNull();
+  });
+
+  it("requires an explicit deletion version even when called without TypeScript validation", () => {
+    const material = store.createMaterial(
+      alice.id,
+      store.listVaults(alice.id)[0].id,
+      { title: "版指定が必要な教材" },
+    );
+    expect(() =>
+      Reflect.apply(store.deleteMaterial, store, [alice.id, material.id]),
+    ).toThrow(expect.objectContaining({ status: 409 }));
+    expect(store.getMaterial(alice.id, material.id).version).toBe(1);
   });
 
   it("retains attachments when omitted on edit and replaces them only when explicitly supplied", () => {

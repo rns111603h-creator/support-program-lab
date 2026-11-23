@@ -756,10 +756,22 @@ export class VaultStore {
     return this.getMaterial(userId, materialId);
   }
 
-  deleteMaterial(userId: string, materialId: string) {
+  deleteMaterial(userId: string, materialId: string, expectedVersion: number) {
     this.transaction(() => {
-      this.getMaterial(userId, materialId);
-      this.db.prepare("DELETE FROM materials WHERE id = ?").run(materialId);
+      const material = this.getMaterial(userId, materialId);
+      if (expectedVersion !== material.version)
+        throw new VaultError(
+          "教材が更新されています。画面を再読み込みして、最新の内容を確認してから削除してください。",
+          409,
+        );
+      const deleted = this.db
+        .prepare("DELETE FROM materials WHERE id = ? AND version = ?")
+        .run(materialId, expectedVersion);
+      if (!deleted.changes)
+        throw new VaultError(
+          "教材が更新されています。画面を再読み込みして、最新の内容を確認してから削除してください。",
+          409,
+        );
     });
   }
 

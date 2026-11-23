@@ -90,31 +90,196 @@ function inspectText(text: string, location: string): RightsFinding[] {
 }
 
 function xmlToText(xml: string): string {
-  // No XML parser, entities, external resources or embedded scripts are executed.
-  return xml
-    .replace(/<!--[\s\S]*?-->/g, " ")
-    .replace(/<\/(?:w:p|w:tr|a:p)>|<(?:w:br|a:br)\s*\/?\s*>/g, " ")
-    .replace(/<[^>]+>/g, "")
-    .replace(/&#x([0-9a-f]+);/gi, (_, digits: string) => codePoint(digits, 16))
-    .replace(/&#([0-9]+);/g, (_, digits: string) => codePoint(digits, 10))
-    .replace(/&(?:copy|#169);/gi, "©")
-    .replace(
-      /&(?:quot|apos|lt|gt|amp);/g,
-      (entity) =>
-        ({
-          "&quot;": '"',
-          "&apos;": "'",
-          "&lt;": "<",
-          "&gt;": ">",
-          "&amp;": "&",
-        })[entity] ?? entity,
-    )
-    .replace(/\s+/g, " ");
-}
+  // Bounded lexical extraction, not full XML validation. The cursor only moves
+  // forward; each comment/CDATA/PI search either consumes that token or fails
+  // immediately. Unfinished markup is never retried at every later '<'. This
+  // keeps work linear in the already bounded XML input, with no entity expansion
+  // or external-resource access. Unsupported declarations require manual review.
+  const output: string[] = [];
+  const elements: string[] = [];
+  let cursor = xml.charCodeAt(0) === 0xfeff ? 1 : 0;
+  let rootSeen = false;
+  const space = (character: string | undefined) =>
+    character === " " ||
+    character === "\t" ||
+    character === "\r" ||
+    character === "\n";
+  const nameStart = (character: string | undefined) => {
+    const code = character?.charCodeAt(0) ?? -1;
+    return (
+      (code >= 65 && code <= 90) ||
+      (code >= 97 && code <= 122) ||
+      code === 95 ||
+      code === 58
+    );
+  };
+  const namePart = (character: string | undefined) => {
+    const code = character?.charCodeAt(0) ?? -1;
+    return (
+      nameStart(character) ||
+      (code >= 48 && code <= 57) ||
+      code === 45 ||
+      code === 46
+    );
+  };
+  const skipSpace = () => {
+    while (space(xml[cursor])) cursor++;
+  };
+  const readName = () => {
+    const start = cursor;
+    if (!nameStart(xml[cursor])) throw new Error("xml-name");
+    cursor++;
+    while (namePart(xml[cursor])) cursor++;
+    return xml.slice(start, cursor);
+  };
+  const readEntity = () => {
+    cursor++; // '&'
+    if (xml[cursor] === "#") {
+      cursor++;
+      const hexadecimal = xml[cursor] === "x" || xml[cursor] === "X";
+      if (hexadecimal) cursor++;
+      let value = 0;
+      let digits = 0;
+      while (cursor < xml.length) {
+        const code = xml.charCodeAt(cursor);
+        const digit =
+          code >= 48 && code <= 57
+            ? code - 48
+            : hexadecimal && code >= 65 && code <= 70
+              ? code - 55
+              : hexadecimal && code >= 97 && code <= 102
+                ? code - 87
+                : -1;
+        if (digit < 0) break;
+        value = value * (hexadecimal ? 16 : 10) + digit;
+        if (value > 0x10ffff) throw new Error("xml-character");
+        cursor++;
+        digits++;
+      }
+      if (!digits || xml[cursor] !== ";") throw new Error("xml-entity");
+      const validCharacter =
+        value === 9 ||
+        value === 10 ||
+        value === 13 ||
+        (value >= 0x20 && value <= 0xd7ff) ||
+        (value >= 0xe000 && value <= 0xfffd) ||
+        (value >= 0x10000 && value <= 0x10ffff);
+      if (!validCharacter) throw new Error("xml-character");
+      cursor++;
+      return String.fromCodePoint(value);
+    }
+    const start = cursor;
+    while (namePart(xml[cursor]) && cursor - start < 8) cursor++;
+    if (xml[cursor] !== ";") throw new Error("xml-entity");
+    const named: Record<string, string> = {
+      quot: '"',
+      apos: "'",
+      lt: "<",
+      gt: ">",
+      amp: "&",
+      copy: "©",
+    };
+    const entityName = xml.slice(start, cursor);
+    if (!Object.hasOwn(named, entityName)) throw new Error("xml-entity");
+    const value = named[entityName];
+    cursor++;
+    return value;
+  };
 
-function codePoint(digits: string, radix: number): string {
-  const value = Number.parseInt(digits, radix);
-  return value >= 0 && value <= 0x10ffff ? String.fromCodePoint(value) : " ";
+  while (cursor < xml.length) {
+    if (xml[cursor] !== "<") {
+      const start = cursor;
+      while (cursor < xml.length && xml[cursor] !== "<" && xml[cursor] !== "&")
+        cursor++;
+      const text = xml.slice(start, cursor);
+      if (!elements.length && /[^\t\r\n ]/.test(text))
+        throw new Error("xml-outside-root");
+      output.push(text);
+      if (xml[cursor] === "&") {
+        if (!elements.length) throw new Error("xml-outside-root");
+        output.push(readEntity());
+      }
+      continue;
+    }
+    if (xml.startsWith("<!--", cursor)) {
+      const end = xml.indexOf("-->", cursor + 4);
+      if (end < 0 || xml.indexOf("--", cursor + 4) !== end)
+        throw new Error("xml-comment");
+      cursor = end + 3;
+      continue;
+    }
+    if (xml.startsWith("<![CDATA[", cursor)) {
+      if (!elements.length) throw new Error("xml-outside-root");
+      const end = xml.indexOf("]]>", cursor + 9);
+      if (end < 0) throw new Error("xml-cdata");
+      output.push(xml.slice(cursor + 9, end));
+      cursor = end + 3;
+      continue;
+    }
+    if (xml.startsWith("<?", cursor)) {
+      const end = xml.indexOf("?>", cursor + 2);
+      if (end < 0) throw new Error("xml-processing-instruction");
+      cursor = end + 2;
+      continue;
+    }
+    if (xml.startsWith("<!", cursor))
+      throw new Error("xml-unsupported-declaration");
+    cursor++;
+    const closing = xml[cursor] === "/";
+    if (closing) cursor++;
+    const name = readName();
+    if (closing) {
+      skipSpace();
+      if (xml[cursor] !== ">" || elements.pop() !== name)
+        throw new Error("xml-closing-tag");
+      cursor++;
+      if (name === "w:p" || name === "w:tr" || name === "a:p") output.push(" ");
+      continue;
+    }
+    if (!elements.length) {
+      if (rootSeen) throw new Error("xml-multiple-roots");
+      rootSeen = true;
+    }
+    let finished = false;
+    while (cursor < xml.length) {
+      const beforeSpace = cursor;
+      skipSpace();
+      if (xml[cursor] === ">") {
+        cursor++;
+        elements.push(name);
+        if (elements.length > 256) throw new Error("xml-depth");
+        if (name === "w:br" || name === "a:br") output.push(" ");
+        finished = true;
+        break;
+      }
+      if (xml[cursor] === "/" && xml[cursor + 1] === ">") {
+        cursor += 2;
+        if (name === "w:br" || name === "a:br") output.push(" ");
+        finished = true;
+        break;
+      }
+      if (cursor === beforeSpace) throw new Error("xml-attribute-separator");
+      readName();
+      skipSpace();
+      if (xml[cursor] !== "=") throw new Error("xml-attribute");
+      cursor++;
+      skipSpace();
+      const quote = xml[cursor];
+      if (quote !== '"' && quote !== "'")
+        throw new Error("xml-attribute-quote");
+      cursor++;
+      while (cursor < xml.length && xml[cursor] !== quote) {
+        if (xml[cursor] === "<") throw new Error("xml-attribute-value");
+        if (xml[cursor] === "&") readEntity();
+        else cursor++;
+      }
+      if (xml[cursor] !== quote) throw new Error("xml-attribute-unfinished");
+      cursor++;
+    }
+    if (!finished) throw new Error("xml-tag-unfinished");
+  }
+  if (!rootSeen || elements.length) throw new Error("xml-document-unfinished");
+  return output.join("").replace(/\s+/g, " ");
 }
 
 type OfficeInspection = {
