@@ -5,8 +5,7 @@ struct SessionView: View {
     let program: Program
     @Environment(\.dismiss) private var dismiss
     @State private var stepIndex = 0
-    @State private var elapsedBeforePause: TimeInterval = 0
-    @State private var startedAt: Date?
+    @State private var clock = SessionClock()
     @State private var finished = false
     @State private var ending = false
 
@@ -28,11 +27,11 @@ struct SessionView: View {
                             Text("工程 \(stepIndex + 1) / \(steps.count)").font(.caption).foregroundStyle(.secondary)
                             Text(currentStep.title).font(.largeTitle).fontWeight(.semibold)
                             TimelineView(.periodic(from: .now, by: 1)) { context in
-                                let elapsed = elapsedBeforePause + max(0, startedAt.map { context.date.timeIntervalSince($0) } ?? 0)
+                                let elapsed = clock.elapsed(at: context.date)
                                 let target = TimeInterval(max(0, currentStep.minutes) * 60)
-                                let remaining = max(0, target - elapsed)
+                                let remaining = clock.remaining(duration: target, at: context.date)
                                 VStack(alignment: .leading, spacing: 8) {
-                                    Text(clock(remaining)).font(.system(size: 64, weight: .medium, design: .rounded)).monospacedDigit().minimumScaleFactor(0.5).lineLimit(1)
+                                    Text(formattedClock(remaining)).font(.system(size: 64, weight: .medium, design: .rounded)).monospacedDigit().minimumScaleFactor(0.5).lineLimit(1)
                                         .accessibilityLabel("残り\(Int(remaining) / 60)分\(Int(remaining) % 60)秒")
                                         .accessibilityIdentifier("session.remaining")
                                     Text(elapsed >= target && target > 0 ? "予定時間になりました。次へ進むタイミングを判断してください。" : "予定 \(currentStep.minutes)分")
@@ -43,12 +42,12 @@ struct SessionView: View {
                                 Button {
                                     toggleRunning()
                                 } label: {
-                                    Label(startedAt == nil ? "開始・再開" : "一時停止", systemImage: startedAt == nil ? "play.fill" : "pause.fill")
+                                    Label(clock.isRunning ? "一時停止" : "開始・再開", systemImage: clock.isRunning ? "pause.fill" : "play.fill")
                                         .frame(maxWidth: .infinity)
                                 }
                                 .buttonStyle(.borderedProminent)
                                 .accessibilityIdentifier("session.toggle")
-                                Button("リセット") { elapsedBeforePause = 0; startedAt = nil }
+                                Button("リセット") { clock.reset() }
                                     .buttonStyle(.bordered)
                                     .accessibilityIdentifier("session.reset")
                             }
@@ -93,25 +92,25 @@ struct SessionView: View {
     }
 
     private func toggleRunning() {
-        if let startedAt {
-            elapsedBeforePause += max(0, Date().timeIntervalSince(startedAt))
-            self.startedAt = nil
-        } else { startedAt = Date() }
+        if clock.isRunning {
+            clock.pause(at: Date())
+        } else {
+            clock.start(at: Date())
+        }
     }
 
     private func advance() {
-        let wasRunning = startedAt != nil
-        elapsedBeforePause = 0
+        let wasRunning = clock.isRunning
+        clock.reset()
         if stepIndex + 1 < steps.count {
             stepIndex += 1
-            startedAt = wasRunning ? Date() : nil
+            if wasRunning { clock.start(at: Date()) }
         } else {
-            startedAt = nil
             finished = true
         }
     }
 
-    private func clock(_ interval: TimeInterval) -> String {
+    private func formattedClock(_ interval: TimeInterval) -> String {
         let seconds = max(0, Int(interval.rounded(.up)))
         return String(format: "%02d:%02d", seconds / 60, seconds % 60)
     }

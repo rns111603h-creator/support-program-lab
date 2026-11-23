@@ -65,6 +65,7 @@ public final class ProgramRepository {
     private static let lock = NSRecursiveLock()
     private static let attachmentLimit = 10 * 1024 * 1024
     private static let archiveLimit = 16 * 1024 * 1024
+    private static let attachmentExtensions: Set<String> = ["pdf", "pptx", "docx", "png", "jpg", "jpeg", "txt", "md"]
     private static let format = "support-program-lab.program"
     private let root: URL
     private let manager = FileManager.default
@@ -85,10 +86,6 @@ public final class ProgramRepository {
         self.root = requested.resolvingSymlinksInPath().standardizedFileURL
         try synchronized {
             try createDirectory(self.root)
-            var backupValues = URLResourceValues()
-            backupValues.isExcludedFromBackup = true
-            var localRoot = self.root
-            try localRoot.setResourceValues(backupValues)
             if try Self.attributes(at: indexURL) == nil {
                 guard try manager.contentsOfDirectory(atPath: self.root.path).isEmpty else {
                     throw ProgramKitError.corruptStore
@@ -144,7 +141,7 @@ public final class ProgramRepository {
             guard let position = programs.firstIndex(where: { $0.id == programID }) else {
                 throw ProgramKitError.programNotFound
             }
-            try validateFilename(filename)
+            try validateAttachmentFilename(filename)
             guard !data.isEmpty, data.count <= Self.attachmentLimit,
                   programs[position].attachments.count < 10,
                   programs[position].attachments.reduce(0, { $0 + $1.sizeBytes }) <= Self.attachmentLimit - data.count else {
@@ -339,6 +336,13 @@ public final class ProgramRepository {
         return UUID().uuidString + "." + (safe ? suffix : "bin")
     }
 
+    private func validateAttachmentFilename(_ filename: String) throws {
+        try validateFilename(filename)
+        guard Self.attachmentExtensions.contains((filename as NSString).pathExtension.lowercased()) else {
+            throw ProgramKitError.invalidFilename
+        }
+    }
+
     private func validate(_ program: Program) throws {
         guard !program.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
               program.title.count <= 200, program.summary.count <= 5_000,
@@ -363,7 +367,7 @@ public final class ProgramRepository {
         }
         var size = 0
         for attachment in program.attachments {
-            try validateFilename(attachment.filename)
+            try validateAttachmentFilename(attachment.filename)
             try validateFilename(attachment.storedName)
             guard attachment.sizeBytes > 0, attachment.sizeBytes <= Self.attachmentLimit - size else {
                 throw ProgramKitError.attachmentLimitExceeded
@@ -428,23 +432,12 @@ public final class ProgramRepository {
     }
 
     private func commit(_ programs: [Program], removing urls: [URL]) throws {
-        let trash = try checkedURL(root.appendingPathComponent(".trash-" + UUID().uuidString, isDirectory: true))
-        var moved: [(original: URL, staged: URL)] = []
-        do {
-            if !urls.isEmpty { try createDirectory(trash) }
-            for url in urls {
-                _ = try checkedURL(url)
-                let staged = trash.appendingPathComponent(UUID().uuidString)
-                try manager.moveItem(at: url, to: staged)
-                moved.append((url, staged))
-            }
-            try writeIndex(programs)
-        } catch {
-            for entry in moved.reversed() { try? manager.moveItem(at: entry.staged, to: entry.original) }
-            if moved.allSatisfy({ manager.fileExists(atPath: $0.original.path) }) { try? manager.removeItem(at: trash) }
-            throw error
-        }
-        // A cleanup failure keeps only an unreferenced private trash directory, never live metadata.
-        if !urls.isEmpty { try? manager.removeItem(at: trash) }
+        let removed = try urls.map { try checkedURL($0) }
+        // Until the atomic metadata replacement succeeds, all previously referenced
+        // attachments remain live. Interruption cannot strand the old index.
+        try writeIndex(programs)
+        // After commit, failed cleanup leaves only private, unreferenced files.
+        // Reporting a failed save here would misrepresent the committed metadata.
+        for url in removed { try? manager.removeItem(at: url) }
     }
 }

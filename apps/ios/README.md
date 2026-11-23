@@ -38,7 +38,7 @@ Issue #12で対象・拒否・未実装範囲を定義し、保存APIのstubと1
 python3 apps/ios/scripts/release-metadata.py apps/ios/ReleaseConfiguration.json
 ```
 
-この検査はローカルのメタデータ形式だけを確認します。URLの実稼働、AppleでのID登録・契約・署名、審査申告の適否を証明しません。草案は意図的に不合格となります。アプリID・TeamはXcode側にも正式な値を設定します。`jp.supportprogramlab.ios.dev` は開発用の仮IDです。秘密鍵や証明書、AppleパスワードをGitやチャットへ貼りません。
+この検査はローカルのメタデータ形式だけを確認します。keywordsはUTF-8で100 bytes以内です。Releaseビルドの前段にも接続し、正式値が未設定の場合やXcode側のBundle ID・Teamと設定が異なる場合はビルドを止めます。DebugのSimulatorビルドはこの提出ゲートの対象外です。URLの実稼働、AppleでのID登録・契約・署名、審査申告の適否を証明しません。草案は意図的に不合格となります。アプリID・TeamはXcode側にも正式な値を設定します。`jp.supportprogramlab.ios.dev` は開発用の仮IDです。秘密鍵や証明書、AppleパスワードをGitやチャットへ貼りません。
 
 [App Store要件と本人判断ゲート](docs/app-store-readiness.md)、[プライバシー草案](docs/privacy-policy-draft.md)、[サポート草案](docs/support-draft.md)を参照してください。公開URL・運営者・初版範囲が未決の草案を完成文書として提出しません。
 

@@ -1,8 +1,10 @@
 name: iOS checks
 
 on:
+  pull_request:
+    paths: ["apps/ios/**", ".github/workflows/ios-checks.yml"]
   push:
-    branches: ["feat/ios-appstore"]
+    branches: [main, "feat/**"]
     paths: ["apps/ios/**", ".github/workflows/ios-checks.yml"]
   workflow_dispatch:
 
@@ -10,7 +12,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: ios-checks-${{ github.ref }}
+  group: ios-checks-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
@@ -45,6 +47,15 @@ jobs:
           xcodebuild -project apps/ios/SupportProgramLab.xcodeproj -scheme SupportProgramLab -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath apps/ios/DerivedData CODE_SIGNING_ALLOWED=NO build 2>&1 | tee apps/ios/artifacts/simulator-build.log
       - name: Launch Simulator and capture native screen
         run: python3 apps/ios/scripts/simulator-smoke.py
+      - name: Refuse Release without submission configuration
+        run: |
+          set +e
+          xcodebuild -project apps/ios/SupportProgramLab.xcodeproj -scheme SupportProgramLab -configuration Release -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath apps/ios/DerivedData CODE_SIGNING_ALLOWED=NO build > apps/ios/artifacts/release-gate.log 2>&1
+          result=$?
+          set -e
+          test "$result" -ne 0
+          test ! -f apps/ios/ReleaseConfiguration.json
+          python3 -c "from pathlib import Path; assert 'メタデータを検査できません:' in Path('apps/ios/artifacts/release-gate.log').read_text()"
       - name: Require behavior tests to pass
         if: always() && steps.core-tests.outcome != 'success'
         run: exit 1
