@@ -1,0 +1,69 @@
+name: iOS checks
+
+on:
+  pull_request:
+    paths: ["apps/ios/**", ".github/workflows/ios-checks.yml"]
+  push:
+    branches: [main, "feat/**"]
+    paths: ["apps/ios/**", ".github/workflows/ios-checks.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-checks-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  native:
+    runs-on: macos-26
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Record Apple toolchain
+        run: |
+          mkdir -p apps/ios/artifacts
+          python3 apps/ios/scripts/select-xcode.py
+      - name: Record selected SDK
+        run: |
+          xcodebuild -version | tee apps/ios/artifacts/xcode-version.txt
+          xcodebuild -showsdks | tee apps/ios/artifacts/sdks.txt
+          swift --version
+          python3 -c "import subprocess; version=subprocess.check_output(['xcodebuild','-version'],text=True).split()[1]; assert int(version.split('.')[0]) >= 26, 'App Store requires Xcode 26 or newer'"
+      - name: ProgramKit behavior tests
+        id: core-tests
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          swift test --package-path apps/ios/ProgramKit 2>&1 | tee apps/ios/artifacts/swift-tests.log
+      - name: Submission metadata checker tests
+        run: python3 -m unittest discover -s apps/ios/scripts -p 'test_*.py'
+      - name: Build native iPhone app without signing
+        run: |
+          set -euo pipefail
+          xcodebuild -project apps/ios/SupportProgramLab.xcodeproj -scheme SupportProgramLab -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath apps/ios/DerivedData CODE_SIGNING_ALLOWED=NO build 2>&1 | tee apps/ios/artifacts/simulator-build.log
+      - name: Launch Simulator and capture native screen
+        run: python3 apps/ios/scripts/simulator-smoke.py
+      - name: Refuse Release without submission configuration
+        run: |
+          set +e
+          xcodebuild -project apps/ios/SupportProgramLab.xcodeproj -scheme SupportProgramLab -configuration Release -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath apps/ios/DerivedData CODE_SIGNING_ALLOWED=NO build > apps/ios/artifacts/release-gate.log 2>&1
+          result=$?
+          set -e
+          test "$result" -ne 0
+          test ! -f apps/ios/ReleaseConfiguration.json
+          python3 -c "from pathlib import Path; assert 'メタデータを検査できません:' in Path('apps/ios/artifacts/release-gate.log').read_text()"
+      - name: Require behavior tests to pass
+        if: always() && steps.core-tests.outcome != 'success'
+        run: exit 1
+      - name: Preserve synthetic native evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ios-native-evidence
+          path: apps/ios/artifacts/
+          retention-days: 7
+          if-no-files-found: ignore

@@ -1,0 +1,12 @@
+.build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+artifacts/
+ReleaseConfiguration.json
+*.xcarchive/
+*.ipa
+*.p12
+*.mobileprovision
+__pycache__/
+*.pyc

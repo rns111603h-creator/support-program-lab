@@ -4,6 +4,8 @@
 
 個人・チームの教材保管庫を `apps/marketplace` に追加しています。ID・パスワード認証、教材と添付の保存、チーム招待、期限付き共有、素材の権利確認アラートを備えたNode.jsアプリです。[起動方法・検査範囲・公開前の残件](apps/marketplace/README.md) を参照してください。GitHub Pagesの静的版と認証付き保管庫は実行環境が異なります。
 
+iPhoneのネイティブ版は `apps/ios` で開発中です。[開発・検証とApp Store提出前の残件](apps/ios/README.md)を参照してください。初版のクラウド範囲・個人Appleチーム・実機・署名・提出は未決／未実施で、App Store公開済みではありません。
+
 ## Local Preview
 
 From this directory:

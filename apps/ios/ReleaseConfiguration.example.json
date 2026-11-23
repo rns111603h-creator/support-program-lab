@@ -1,0 +1,15 @@
+{
+  "initialScope": "UNDECIDED",
+  "bundleIdentifier": "jp.supportprogramlab.ios.dev",
+  "appleTeamID": "",
+  "appName": "支援プログラムLab",
+  "subtitle": "教材を整理しプログラムを進行",
+  "description": "【未提出の草案・初版範囲の確定後に編集】\n自作の教材や資料を整理し、プログラムの準備と進行に使うアプリです。端末内の教材を検索・編集し、場面ごとの進行メモとタイマーで実施を支えます。資料を読み込み、必要な教材を書き出して共有できます。書き出す本文・添付・出典・権利メモを確認してから操作します。\n\n権利の適否を保証するアプリではありません。実利用者の個人情報や、持ち出せない業務資料を保存しないでください。",
+  "keywords": "教材,研修,プログラム,資料,進行",
+  "privacyPolicyURL": "",
+  "supportURL": "",
+  "reviewContact": { "name": "", "email": "", "phone": "" },
+  "backendURL": "",
+  "accountDeletionEvidence": "",
+  "sharedContentEvidence": ""
+}
