@@ -2,11 +2,12 @@ import Link from "next/link";
 import { BrandMark } from "./ui-icons";
 
 type SiteHeaderProps = {
-  active?: "top" | "materials" | "library" | "seller" | "review";
+  active?: "top" | "materials" | "library" | "seller" | "review" | "vault";
 };
 
 const navItems = [
   { key: "top", en: "TOP", label: "トップ", href: "/" },
+  { key: "vault", en: "VAULT", label: "保管庫", href: "/vault" },
   { key: "materials", en: "LIBRARY", label: "教材", href: "/materials" },
   { key: "library", en: "MY", label: "保存済み", href: "/library" },
   { key: "seller", en: "SELLER", label: "投稿", href: "/seller" },
@@ -16,12 +17,18 @@ const navItems = [
 export function SiteHeader({ active = "top" }: SiteHeaderProps) {
   return (
     <header className="border-b border-[var(--line)] bg-[var(--paper)]/95">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 py-5 md:px-8">
-        <Link className="inline-flex items-center gap-3 text-sm font-black tracking-[0.12em]" href="/">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-5 px-5 py-5 md:px-8">
+        <Link
+          className="inline-flex items-center gap-3 text-sm font-black tracking-[0.12em]"
+          href="/"
+        >
           <BrandMark className="size-9 shrink-0" />
           <span>支援プログラムLab</span>
         </Link>
-        <nav className="hidden items-center gap-7 md:flex">
+        <nav
+          aria-label="主要ナビゲーション"
+          className="order-3 flex w-full items-center gap-5 overflow-x-auto py-1 md:order-none md:w-auto md:gap-7"
+        >
           {navItems.map((item) => (
             <Link
               className={`border-b pb-2 text-[11px] font-semibold tracking-[0.28em] transition-colors ${
@@ -32,18 +39,23 @@ export function SiteHeader({ active = "top" }: SiteHeaderProps) {
               href={item.href}
               key={item.key}
             >
-              {item.en}
-              <span className="sr-only"> {item.label}</span>
+              <span className="block whitespace-nowrap py-2">{item.label}</span>
             </Link>
           ))}
         </nav>
-        <span className="hidden h-4 w-9 border-y border-[var(--foreground)] md:inline-block" aria-hidden="true" />
+        <Link
+          href="/login"
+          className="shrink-0 py-3 text-xs font-bold text-[var(--indigo)]"
+        >
+          ログイン
+        </Link>
       </div>
       <div className="border-t border-[var(--line)]">
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-5 py-3 text-[11px] font-bold tracking-[0.12em] text-[var(--muted)] md:px-8">
           <span className="size-1.5 rounded-full bg-[var(--gold)]" />
-          <span>無料教材を公開中</span>
-          <span className="hidden sm:inline">- 会員登録なしで閲覧できます</span>
+          <span>
+            教材棚・保存済み・投稿・審査はデモ表示です。実際の保存・共有は「保管庫」から利用できます。
+          </span>
         </div>
       </div>
     </header>

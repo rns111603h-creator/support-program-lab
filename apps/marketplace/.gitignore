@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Private vault data (never publish or commit)
+/.vault-data/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+/test-results/
+/playwright-report/

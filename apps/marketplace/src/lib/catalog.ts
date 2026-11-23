@@ -182,7 +182,7 @@ export const communityMaterials: MarketplaceMaterial[] = [
     slug: "sleep-rhythm-sheet",
     title: "睡眠リズムを整える週間シート",
     category: "生活管理",
-    sellerName: "アソシア教材チーム",
+    sellerName: "サンプル教材チーム",
     summary: "起床、就寝、通所への影響を見える化し、無理のない一つの工夫を決めます。",
     description:
       "睡眠の問題を本人責任にせず、生活の流れを一緒に確認するための週間シートです。医療的判断はせず、相談につなげる観点も含めています。",
@@ -274,7 +274,7 @@ export const demoSellerSubmissions: Phase2Submission[] = [
   {
     id: "draft_sleep_rhythm",
     title: "睡眠リズムを整える",
-    sellerName: "アソシア教材チーム",
+    sellerName: "サンプル教材チーム",
     status: "draft",
     updatedAt: "2026-07-01",
     category: "生活管理",
@@ -300,7 +300,7 @@ export const demoSellerSubmissions: Phase2Submission[] = [
   {
     id: "submitted_time",
     title: "時間を守る工夫",
-    sellerName: "アソシア教材チーム",
+    sellerName: "サンプル教材チーム",
     status: "submitted",
     updatedAt: "2026-07-04",
     category: "ビジネスマナー",
@@ -314,7 +314,7 @@ export const demoSellerSubmissions: Phase2Submission[] = [
   {
     id: "approved_greeting",
     title: "挨拶と第一印象",
-    sellerName: "アソシア教材チーム",
+    sellerName: "サンプル教材チーム",
     status: "approved",
     updatedAt: "2026-07-02",
     category: "ビジネスマナー",

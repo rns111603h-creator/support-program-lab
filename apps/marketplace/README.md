@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 支援プログラムLab — 個人・チーム保管庫
 
-## Getting Started
+既存の公開教材モックと、実際に保存・共有できる保管庫を同じNext.jsアプリに置いています。保管庫は `/vault`、登録は `/signup` です。公開教材棚・保存済み・投稿・審査の従来画面はデモです。
 
-First, run the development server:
+## 起動
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
+Node.js 24以上、pnpmを使用します。
+
+```sh
+cd apps/marketplace
+pnpm install --frozen-lockfile
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`http://localhost:3000/signup` で架空のIDとパスワードを登録して試せます。メールアドレスは不要です。パスワードは12〜128文字。初期アカウントや共通パスワードはありません。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```sh
+pnpm check:boundaries
+pnpm format:check
+pnpm test
+pnpm lint
+pnpm exec tsc --noEmit
+pnpm build
+pnpm exec playwright install chromium
+pnpm test:e2e
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+既存のChromiumを使う場合は、`PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium pnpm test:e2e` と指定できます。E2Eは本番ビルドを起動し、3100番ポートと一時ディレクトリ内の専用DBを使い、通常の保管庫データを再利用しません。テストには架空データのみを使います。
 
-## Learn More
+## できること
 
-To learn more about Next.js, take a look at the following resources:
+- ID・パスワード登録、ログイン、ログアウト、7日間のサーバーセッション。
+- 個人保管庫の自動作成、チーム保管庫の作成、ログインが必要な一回限りのチーム招待、メンバー除外。
+- 教材本文、概要、タグ、出典URL、権利メモと添付の保存・編集・削除・検索。
+- PDF / PPTX / DOCX / PNG / JPEG / TXT / Markdownを最大10点、1教材の添付合計10MiBまで保存。
+- 教材ごとの閲覧専用共有リンク。アカウント不要、有効期間1〜30日、既定7日、取消可能。教材更新・削除やチームメンバー除外で既存の共有は失効します。
+- 入力文字・添付名・対応Office XML等のローカル権利確認。外部APIへの送信や出典URLの自動取得はありません。
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+チームメンバーはチーム教材を閲覧・編集・削除・共有できます。メンバー管理と招待発行は管理者のみです。共有リンクは転送されると転送先も閲覧できます。取得済みファイルを遠隔削除する機能ではありません。
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 保存とバックアップ
 
-## Deploy on Vercel
+既定の保存場所は、アプリ作業ディレクトリ内の `.vault-data/vault.sqlite` です。教材・添付・アカウント・セッションをこのDBに保存します。ディレクトリは0700、DBは0600で作成し、Git対象から除外します。パスワードはsalt付きscrypt、セッション・共有・招待トークンはhashを保存します。ストレージ自体の暗号化は未実装です。
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+個人用の永続ディレクトリを使う場合は、起動時に `VAULT_DATA_DIR=/absolute/private/directory` を設定してください。`public` 配下は拒否します。専用ディレクトリを指定し、業務環境・他サービスのデータディレクトリを使わないでください。環境変数を使わず、アプリの作業場所を変えると別のDBが作成されます。
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+バックアップはアプリを停止し、`vault.sqlite` を非公開の別保管先へコピーします。復元は停止した状態で専用保存先へ戻し、アクセス権を確認して同じ `VAULT_DATA_DIR` で起動します。アカウントや有効な共有リンクも復元対象なので、バックアップは機密データとして管理してください。本番用の自動バックアップ・復旧運用は別途整備が必要です。
+
+## 検査の限界
+
+権利アラートは確認の手がかりであり、適法性や許諾を保証しません。ブランド名への言及も権利侵害と断定しません。画像のロゴ識別・OCR・PDF本文・既存作品との類似照合は未対応です。未検査の範囲を結果に表示し、アラートがあっても保存できます。共有には注意事項の確認が必要です。
+
+## 公開前の残件
+
+この実装は単一Nodeサーバーと永続ディスクを前提にした開発版です。GitHub Pagesや一時ディスクのサーバーレス環境へ、そのまま配備しないでください。本番はHTTPSが必須です。本番モードのセッションCookieにはSecureを付けます。
+
+メールによるパスワード回復、アカウント削除の画面、チーム所有権移管、登録全体のレート制限、ユーザー別総容量クォータ、自動バックアップ・監視は未実装です。ログインはIDごと15分間に5回まで試行できますが、公開サービス全体への負荷対策を完了したものではありません。
+
+実利用者の個人情報や持ち出せない業務資料を保存しないでください。公開・配備、外部API送信、課金は別判断です。[作業と残件のIssue](https://github.com/rns111603h-creator/support-program-lab/issues) を参照してください。
+
+## 開発方法と証拠
+
+[リポジトリの開発・検証ルール](../../AGENTS.md) と [機能マップ・検証記録](docs/vault-verification.md) を参照してください。PR/push時のCI定義は `.github/workflows/vault-checks.yml` にあります。CIのGitHub上での実行・必須化は、ローカル検証とは別です。境界チェックはクライアントからのサーバー処理呼び出し、公衆配信領域への私有データ混入、一部の秘密形式を検出します。すべての機密情報や権利問題を検出するものではありません。
