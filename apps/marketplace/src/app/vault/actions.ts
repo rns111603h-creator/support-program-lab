@@ -84,10 +84,11 @@ export async function inviteAction(
     const result = getVaultStore().createInvite(
       user.id,
       value(data, "vaultId"),
+      value(data, "recipientUsername"),
       Number(value(data, "days")) || 7,
     );
     return {
-      success: "チーム招待リンクを発行しました。このリンクは1回だけ使えます。",
+      success: `${result.recipientUsername}さん宛てのチーム招待リンクを発行しました。指定したアカウントで1回だけ使えます。`,
       link: `/invite/${result.token}`,
     };
   } catch (error) {

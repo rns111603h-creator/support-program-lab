@@ -206,6 +206,20 @@ test("チーム招待・共同編集・除外によるアクセスと共有の�
     member.getByRole("heading", { name: "チーム教材", exact: true }),
   ).toHaveCount(0);
   await page.goto(teamPath);
+  await page.setViewportSize({ width: 375, height: 812 });
+  await expect(page.getByText("チームに招待", { exact: true })).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+  await page.screenshot({
+    path: "test-results/vault-team-mobile.png",
+    fullPage: true,
+  });
+  await page
+    .getByLabel("招待先のユーザーID", { exact: true })
+    .fill("team_member");
   await page
     .getByRole("button", { name: "招待リンクを発行", exact: true })
     .click();

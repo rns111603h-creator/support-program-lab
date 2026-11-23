@@ -60,7 +60,10 @@ describe("private route access revalidation", () => {
 
   it("denies restored routes after team removal", () => {
     const team = store.createVault(alice.id, "架空チーム");
-    store.acceptInvite(bob.id, store.createInvite(alice.id, team.id).token);
+    store.acceptInvite(
+      bob.id,
+      store.createInvite(alice.id, team.id, bob.username).token,
+    );
     const material = store.createMaterial(alice.id, team.id, {
       title: "架空教材",
     });

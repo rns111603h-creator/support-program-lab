@@ -3,6 +3,7 @@ import { mkdtempSync, readFileSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
+import { createHash, randomBytes } from "node:crypto";
 import { VaultError, VaultStore, type User } from "../src/lib/vault-store";
 
 const password = "test-only-password-123";
@@ -127,7 +128,7 @@ describe("private vault persistence and authorization", () => {
         }),
       () => store.listShares(bob.id, material.id),
       () => store.listMembers(bob.id, personal.id),
-      () => store.createInvite(alice.id, personal.id),
+      () => store.createInvite(alice.id, personal.id, bob.username),
     ];
     for (const operation of denied) expect(operation).toThrow(VaultError);
     expect(
@@ -144,7 +145,7 @@ describe("private vault persistence and authorization", () => {
   it("uses expiring one-use invitations, prevents privilege escalation and removes access", () => {
     const team = store.createVault(alice.id, "架空のチーム");
     expect(() => store.listMaterials(bob.id, team.id)).toThrow(VaultError);
-    const invitation = store.createInvite(alice.id, team.id);
+    const invitation = store.createInvite(alice.id, team.id, bob.username);
     expect(
       readFileSync(path.join(directory, "vault.sqlite")).includes(
         Buffer.from(invitation.token),
@@ -155,7 +156,9 @@ describe("private vault persistence and authorization", () => {
     expect(() => store.acceptInvite(bob.id, invitation.token)).toThrow(
       VaultError,
     );
-    expect(() => store.createInvite(bob.id, team.id)).toThrow(VaultError);
+    expect(() => store.createInvite(bob.id, team.id, alice.username)).toThrow(
+      VaultError,
+    );
     expect(() => store.removeMember(bob.id, team.id, alice.id)).toThrow(
       VaultError,
     );
@@ -171,7 +174,11 @@ describe("private vault persistence and authorization", () => {
       acknowledged: true,
       expectedVersion: 1,
     });
-    const unusedInvitation = store.createInvite(alice.id, team.id);
+    const unusedInvitation = store.createInvite(
+      alice.id,
+      team.id,
+      bob.username,
+    );
     store.removeMember(alice.id, team.id, bob.id);
     expect(() => store.getMaterial(bob.id, material.id)).toThrow(VaultError);
     expect(store.getSharedMaterial(share.token)).toBeNull();
@@ -179,18 +186,155 @@ describe("private vault persistence and authorization", () => {
       VaultError,
     );
     expect(store.listMembers(alice.id, team.id)).toHaveLength(1);
-    const expiredInvite = store.createInvite(alice.id, team.id, 1);
+    const expiredInvite = store.createInvite(
+      alice.id,
+      team.id,
+      bob.username,
+      1,
+    );
     vi.spyOn(Date, "now").mockReturnValue(Date.now() + 2 * 86_400_000);
     expect(() => store.acceptInvite(bob.id, expiredInvite.token)).toThrow(
       VaultError,
     );
   });
 
+  it("does not consume a recipient-bound invitation when a different account opens it", async () => {
+    const stranger = await store.createUser({ username: "stranger", password });
+    const team = store.createVault(alice.id, "宛先固定の架空チーム");
+    const raw = randomBytes(32).toString("base64url");
+    const hash = createHash("sha256").update(raw).digest("hex");
+    // A small recipient-bound database fixture isolates acceptance from issuance.
+    const fixture = new DatabaseSync(path.join(directory, "vault.sqlite"));
+    const columns = fixture.prepare("PRAGMA table_info(invitations)").all();
+    if (!columns.some((column) => column.name === "recipient_user_id"))
+      fixture.exec("ALTER TABLE invitations ADD COLUMN recipient_user_id TEXT");
+    fixture
+      .prepare(
+        "INSERT INTO invitations (token_hash, vault_id, expires_at, used_at, recipient_user_id) VALUES (?, ?, ?, NULL, ?)",
+      )
+      .run(hash, team.id, Date.now() + 86_400_000, bob.id);
+    fixture.close();
+
+    expect(() => store.acceptInvite(stranger.id, raw)).toThrow(
+      expect.objectContaining({ status: 404 }),
+    );
+    expect(
+      store.listVaults(stranger.id).some((vault) => vault.id === team.id),
+    ).toBe(false);
+    const inspection = new DatabaseSync(path.join(directory, "vault.sqlite"));
+    expect(
+      inspection
+        .prepare("SELECT used_at FROM invitations WHERE token_hash = ?")
+        .get(hash)?.used_at,
+    ).toBeNull();
+    inspection.close();
+    expect(store.acceptInvite(bob.id, raw)).toMatchObject({
+      id: team.id,
+      role: "member",
+    });
+    expect(() => store.acceptInvite(bob.id, raw)).toThrow(VaultError);
+  });
+
+  it("only issues invitations to a required existing normalized recipient ID", () => {
+    const team = store.createVault(alice.id, "登録IDを指定する架空チーム");
+    expect(() =>
+      Reflect.apply(store.createInvite, store, [alice.id, team.id]),
+    ).toThrow(VaultError);
+    for (const recipient of ["", "   ", "not_registered", "_invalid"]) {
+      expect(() => store.createInvite(alice.id, team.id, recipient)).toThrow(
+        VaultError,
+      );
+    }
+    const invitation = store.createInvite(alice.id, team.id, " BOB ", 1);
+    expect(invitation.expiresAt).toBeGreaterThan(Date.now());
+    expect(invitation.expiresAt).toBeLessThanOrEqual(Date.now() + 86_400_000);
+    const inspection = new DatabaseSync(path.join(directory, "vault.sqlite"));
+    const row = inspection
+      .prepare("SELECT recipient_user_id FROM invitations WHERE token_hash = ?")
+      .get(createHash("sha256").update(invitation.token).digest("hex"));
+    inspection.close();
+    expect(row?.recipient_user_id).toBe(bob.id);
+    expect(store.acceptInvite(bob.id, invitation.token).id).toBe(team.id);
+  });
+
+  it("migrates the legacy invitation schema but refuses unbound invitations without consuming them", () => {
+    const team = store.createVault(alice.id, "旧形式の架空チーム");
+    const material = store.createMaterial(alice.id, team.id, {
+      title: "移行前からある架空教材",
+      files: [file],
+    });
+    const raw = randomBytes(32).toString("base64url");
+    const hash = createHash("sha256").update(raw).digest("hex");
+    store.close();
+    const fixture = new DatabaseSync(path.join(directory, "vault.sqlite"));
+    fixture.exec(`DROP TABLE invitations;
+      CREATE TABLE invitations (
+        token_hash TEXT PRIMARY KEY, vault_id TEXT NOT NULL REFERENCES vaults(id) ON DELETE CASCADE,
+        expires_at INTEGER NOT NULL, used_at INTEGER
+      );`);
+    fixture
+      .prepare("INSERT INTO invitations VALUES (?, ?, ?, NULL)")
+      .run(hash, team.id, Date.now() + 86_400_000);
+    fixture.close();
+    store = new VaultStore(directory);
+
+    expect(() => store.acceptInvite(bob.id, raw)).toThrow(
+      expect.objectContaining({ status: 404 }),
+    );
+    const inspection = new DatabaseSync(path.join(directory, "vault.sqlite"));
+    expect(
+      inspection
+        .prepare("PRAGMA table_info(invitations)")
+        .all()
+        .some((column) => column.name === "recipient_user_id"),
+    ).toBe(true);
+    expect(
+      inspection
+        .prepare(
+          "SELECT recipient_user_id, used_at FROM invitations WHERE token_hash = ?",
+        )
+        .get(hash),
+    ).toMatchObject({ recipient_user_id: null, used_at: null });
+    expect(
+      inspection.prepare("PRAGMA foreign_key_list(invitations)").all(),
+    ).toContainEqual(
+      expect.objectContaining({
+        from: "recipient_user_id",
+        table: "users",
+        to: "id",
+        on_delete: "CASCADE",
+      }),
+    );
+    inspection.close();
+    expect(
+      store.acceptInvite(
+        bob.id,
+        store.createInvite(alice.id, team.id, bob.username).token,
+      ).id,
+    ).toBe(team.id);
+    expect(store.listMaterials(bob.id, team.id).map((item) => item.id)).toEqual(
+      [material.id],
+    );
+    expect(
+      store.getFile(bob.id, material.id, material.files[0].id).data,
+    ).toEqual(file.data);
+    store.close();
+    store = new VaultStore(directory);
+    expect(() => store.acceptInvite(bob.id, raw)).toThrow(VaultError);
+    expect(store.getMaterial(bob.id, material.id).title).toBe(material.title);
+  });
+
   it("permits voluntary leave while preventing another member's removal", async () => {
     const charlie = await store.createUser({ username: "charlie", password });
     const team = store.createVault(alice.id, "チーム");
-    store.acceptInvite(bob.id, store.createInvite(alice.id, team.id).token);
-    store.acceptInvite(charlie.id, store.createInvite(alice.id, team.id).token);
+    store.acceptInvite(
+      bob.id,
+      store.createInvite(alice.id, team.id, bob.username).token,
+    );
+    store.acceptInvite(
+      charlie.id,
+      store.createInvite(alice.id, team.id, charlie.username).token,
+    );
     expect(() => store.removeMember(bob.id, team.id, charlie.id)).toThrow(
       VaultError,
     );
@@ -290,7 +434,10 @@ describe("private vault persistence and authorization", () => {
 
   it("rejects stale team deletions without removing updated content, attachments or active shares", () => {
     const team = store.createVault(alice.id, "架空の共同編集チーム");
-    store.acceptInvite(bob.id, store.createInvite(alice.id, team.id).token);
+    store.acceptInvite(
+      bob.id,
+      store.createInvite(alice.id, team.id, bob.username).token,
+    );
     const original = store.createMaterial(alice.id, team.id, {
       title: "削除画面を開いた時点の教材",
       files: [file],

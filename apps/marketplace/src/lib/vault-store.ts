@@ -286,7 +286,8 @@ export class VaultStore {
       );
       CREATE TABLE IF NOT EXISTS invitations (
         token_hash TEXT PRIMARY KEY, vault_id TEXT NOT NULL REFERENCES vaults(id) ON DELETE CASCADE,
-        expires_at INTEGER NOT NULL, used_at INTEGER
+        expires_at INTEGER NOT NULL, used_at INTEGER,
+        recipient_user_id TEXT REFERENCES users(id) ON DELETE CASCADE
       );
       CREATE TABLE IF NOT EXISTS materials (
         id TEXT PRIMARY KEY, vault_id TEXT NOT NULL REFERENCES vaults(id) ON DELETE CASCADE,
@@ -307,6 +308,15 @@ export class VaultStore {
       CREATE INDEX IF NOT EXISTS file_material_idx ON files(material_id);
       CREATE INDEX IF NOT EXISTS share_material_idx ON shares(material_id);
     `);
+    this.transaction(() => {
+      const columns = this.db.prepare("PRAGMA table_info(invitations)").all();
+      if (!columns.some((column) => column.name === "recipient_user_id")) {
+        // Preserve legacy rows for history, but never treat an unbound token as an invitation.
+        this.db.exec(
+          "ALTER TABLE invitations ADD COLUMN recipient_user_id TEXT REFERENCES users(id) ON DELETE CASCADE",
+        );
+      }
+    });
   }
 
   close() {
@@ -531,16 +541,39 @@ export class VaultStore {
     }));
   }
 
-  createInvite(userId: string, vaultId: string, expiresInDays = 7) {
-    const vault = this.requireMembership(userId, vaultId, true);
-    if (vault.kind !== "team")
-      throw new VaultError("個人の保管庫にはメンバーを招待できません。");
-    const raw = token();
-    const expiresAt = Date.now() + checkedDays(expiresInDays) * DAY;
-    this.db
-      .prepare("INSERT INTO invitations VALUES (?, ?, ?, NULL)")
-      .run(digest(raw), vaultId, expiresAt);
-    return { token: raw, expiresAt };
+  createInvite(
+    userId: string,
+    vaultId: string,
+    recipientUsername: string,
+    expiresInDays = 7,
+  ) {
+    return this.transaction(() => {
+      const vault = this.requireMembership(userId, vaultId, true);
+      if (vault.kind !== "team")
+        throw new VaultError("個人の保管庫にはメンバーを招待できません。");
+      const username = normalizeUsername(
+        text(recipientUsername, "招待先のユーザーID", 40, true),
+      );
+      if (!/^[a-z0-9][a-z0-9._-]{2,39}$/.test(username))
+        throw new VaultError("招待先の登録済みユーザーIDを確認してください。");
+      const recipient = this.db
+        .prepare("SELECT id, username FROM users WHERE username = ?")
+        .get(username) as Row | undefined;
+      if (!recipient)
+        throw new VaultError("招待先の登録済みユーザーIDを確認してください。");
+      const raw = token();
+      const expiresAt = Date.now() + checkedDays(expiresInDays) * DAY;
+      this.db
+        .prepare(
+          "INSERT INTO invitations (token_hash, vault_id, expires_at, used_at, recipient_user_id) VALUES (?, ?, ?, NULL, ?)",
+        )
+        .run(digest(raw), vaultId, expiresAt, String(recipient.id));
+      return {
+        token: raw,
+        expiresAt,
+        recipientUsername: String(recipient.username),
+      };
+    });
   }
 
   acceptInvite(userId: string, raw: string): Vault {
@@ -550,12 +583,12 @@ export class VaultStore {
     return this.transaction(() => {
       const row = this.db
         .prepare(
-          "SELECT * FROM invitations WHERE token_hash = ? AND expires_at > ? AND used_at IS NULL",
+          "SELECT * FROM invitations WHERE token_hash = ? AND expires_at > ? AND used_at IS NULL AND recipient_user_id = ?",
         )
-        .get(digest(raw), Date.now()) as Row | undefined;
+        .get(digest(raw), Date.now(), userId) as Row | undefined;
       if (!row)
         throw new VaultError(
-          "招待リンクが無効か、有効期限が切れています。",
+          "招待リンクが無効か、指定されたアカウントと異なるか、有効期限が切れています。古い招待は管理者へ再発行を依頼してください。",
           404,
         );
       this.db

@@ -182,10 +182,26 @@ export default async function VaultPage({
               <section className={cardClass}>
                 <h2 className="text-lg font-bold">チームに招待</h2>
                 <p className="mt-3 mb-4 text-sm leading-7 text-[var(--ink-soft)]">
-                  1人が参加すると使えなくなる招待リンクです。受け取った人はログイン後、この保管庫の教材を閲覧・編集できます。
+                  登録済みのユーザーIDを指定して招待します。指定したアカウントだけが1回参加でき、チームの教材を閲覧・編集・削除・共有できます。ほかのアカウントが開いても招待は消費されません。
                 </p>
                 <ActionForm action={inviteAction} label="招待リンクを発行">
                   <input type="hidden" name="vaultId" value={vaultId} />
+                  <label className="grid gap-2 text-sm font-bold">
+                    招待先のユーザーID
+                    <input
+                      className={fieldClass}
+                      name="recipientUsername"
+                      required
+                      minLength={3}
+                      maxLength={40}
+                      pattern="[a-zA-Z0-9_.\-]+"
+                      autoComplete="off"
+                      placeholder="例: program_member"
+                    />
+                  </label>
+                  <p className="-mt-2 text-xs leading-6 text-[var(--ink-soft)]">
+                    相手にアカウントを作成してもらい、その登録済みIDを確認してください。メールアドレスは使いません。
+                  </p>
                   <label className="grid gap-2 text-sm font-bold">
                     有効期間
                     <select className={fieldClass} name="days" defaultValue="7">

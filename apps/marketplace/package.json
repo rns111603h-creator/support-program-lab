@@ -10,7 +10,7 @@
     "test": "vitest run",
     "test:e2e": "pnpm build && playwright test",
     "check:boundaries": "node --test scripts/check-vault-boundaries.test.mjs && node scripts/check-vault-boundaries.mjs",
-    "format:check": "prettier --check \"src/app/{vault,login,signup,share,invite,api}/**/*.{ts,tsx}\" \"src/components/vault-*.tsx\" src/components/site-header.tsx \"src/lib/{rights-check,vault-*}.ts\" \"tests/{rights-check,vault-store,vault-access}.test.ts\" e2e \"scripts/check-vault-boundaries*.mjs\" playwright.config.ts vitest.config.ts next.config.ts"
+    "format:check": "prettier --check \"src/app/{vault,login,signup,share,invite,api}/**/*.{ts,tsx}\" \"src/components/vault-*.tsx\" src/components/site-header.tsx \"src/lib/{rights-check,vault-*}.ts\" \"tests/{rights-check,vault-store,vault-access,vault-restore}.test.ts\" e2e \"scripts/check-vault-boundaries*.mjs\" scripts/restore-vault.mjs playwright.config.ts vitest.config.ts next.config.ts"
   },
   "dependencies": {
     "next": "16.4.6",

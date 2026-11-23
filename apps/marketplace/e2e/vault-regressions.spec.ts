@@ -129,6 +129,9 @@ test("チームから除外された後、履歴からチーム教材を再表�
     await register(member, "regression_team_member");
     await page.goto(teamPath);
     await page
+      .getByLabel("招待先のユーザーID", { exact: true })
+      .fill("regression_team_member");
+    await page
       .getByRole("button", { name: "招待リンクを発行", exact: true })
       .click();
     const invitation = page.locator('a[href^="/invite/"]');
